@@ -7,3 +7,4 @@
   - jsimm046 - Jacqueline Simmons - jsimm046@odu.edu
   - pmull011 - Parker Mullenax - dmull011@odu.edu
   - Qwazwazz - Mark Stoegbauer - mstoe001@odu.edu
+  - Joshua Adkins - jadki007@odu.edu
