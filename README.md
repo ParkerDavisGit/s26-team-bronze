@@ -1,5 +1,12 @@
 # s26-team-bronze
 
+# Requirements
+NodeJS:
+
+# Installation
+run 'npm install' inside the directory.
+Setup your local MySQL server. If you have difficulties, ask Parker D. for help.
+
 # Members
 
   - ParkerDavisGit - Parker Davis - pdavi011@odu.edu
