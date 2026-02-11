@@ -20,18 +20,18 @@ app.listen(3000, () => {
 
 
 // MySQL Test
-// const connection = mysql.createConnection({
-//     host: 'localhost',     // host for connection
-//     port: 3306,            // default port for mysql is 3306
-//     database: 'test_users',      // database from which we want to connect our node application
-//     user: 'joe',          // username of the mysql connection
-//     password: 'joemama'       // password of the mysql connection
-// });
+const connection = mysql.createConnection({
+    host: 'localhost',     // host for connection
+    port: 3306,            // default port for mysql is 3306
+    database: 'spoiler_alert',      // database from which we want to connect our node application
+    user: 'bronzeimus-prime',          // username of the mysql connection
+    password: 'zmuf8r94111'       // password of the mysql connection
+});
 
-// connection.connect(function(err) {
-//   if (err) throw err;
-//   connection.query("SELECT name FROM cats", function (error, results, fields) {
-//     if (error != null) { console.log(error); return; }
-//     console.log(results);
-//   });
-// });
+connection.connect(function(err) {
+  if (err) throw err;
+  connection.query("SELECT * FROM user", function (error, results, fields) {
+    if (error != null) { console.log(error); return; }
+    console.log(results);
+  });
+});
