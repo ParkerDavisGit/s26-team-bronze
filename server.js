@@ -5,21 +5,11 @@ const   mysql = require('mysql');
 const app = express();
 const dir_static = __dirname + "/static";
 
-// Site pages
-app.get('/', (req, res)=>{
-    res.status(200);
-    res.set('Content-Type', 'text/html');
-    res.send("Welcome to root URL of Server");
-});
+app.use(express.static(dir_static));
 
-app.get('/gello', (req, res)=>{
-    const options = {
-        root: dir_static
-    };
-    
-    res.status(200);
-    res.set('Content-Type', 'text/html');
-    res.sendFile("gello.html", options);
+// Site Pages
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: dir_static });
 });
 
 
