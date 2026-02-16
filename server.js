@@ -1,16 +1,15 @@
 // Import Express
-const express = require('express');
-const   mysql = require('mysql'); 
+var express = require('express');
+var indexRouter = require("./routes/index.js");
 
-const app = express();
-const dir_static = __dirname + "/static";
+var app = express();
+app.set('views', 'views');
+app.set('view engine', 'ejs');
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(express.static('public'));
 
-app.use(express.static(dir_static));
-
-// Site Pages
-app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: dir_static });
-});
+app.use('/', indexRouter);
 
 
 // Start the server
@@ -18,7 +17,7 @@ app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
 });
 
-
+/*
 //MySQL Test
 const connection = mysql.createConnection({
     host: 'localhost',     // host for connection
@@ -35,3 +34,4 @@ connection.connect(function(err) {
     console.log(results);
   });
 });
+*/
