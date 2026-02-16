@@ -1,6 +1,9 @@
 // Import Express
 var express = require('express');
 var indexRouter = require("./routes/index.js");
+var recallsRouter = require("./routes/recalls.js");
+var pantryRouter = require("./routes/pantry.js");
+var settingsRouter = require("./routes/settings.js");
 
 var app = express();
 app.set('views', 'views');
@@ -10,6 +13,9 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'));
 
 app.use('/', indexRouter);
+app.use('/recalls', recallsRouter);
+app.use('/pantry', pantryRouter);
+app.use('/settings', settingsRouter);
 
 
 // Start the server
