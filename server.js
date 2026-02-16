@@ -19,7 +19,7 @@ app.listen(3000, () => {
 });
 
 
-// MySQL Test
+//MySQL Test
 const connection = mysql.createConnection({
     host: 'localhost',     // host for connection
     port: 3306,            // default port for mysql is 3306
