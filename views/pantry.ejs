@@ -61,8 +61,10 @@
       <h3>Your registered purchases appear here!</h3>
       <h3>Example Food Data</h3>
       <ul>
-        <% items.forEach(item => { %>
-          <li><%= item %</li>
+        <% food_data.forEach(item => { %>
+          <li>
+            <%= item["product_name"] %>
+          </li>
         <% }) %>
       </ul>
 </div>
