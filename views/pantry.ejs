@@ -60,13 +60,30 @@
       Here too much raining.</p>
       <h3>Your registered purchases appear here!</h3>
       <h3>Example Food Data</h3>
-      <ul>
-        <% food_data.forEach(item => { %>
-          <li>
-            <%= item %>
-          </li>
-        <% }) %>
-      </ul>
+
+      <% if (!food_data || food_data.length === 0) { %>
+        <p>No pantry items.</p>
+      <% } else { %>
+        <table class = "table table-striped">
+          <thead>
+            <tr>
+              <th>Barcode</th>
+              <th>Product Name</th>
+              <th>Brand</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% food_data.forEach(product => { %>
+            <tr>
+              <td><%= product.upc %></td>
+              <td><%= product.product_name %></td>
+              <td><%= product.brand %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   

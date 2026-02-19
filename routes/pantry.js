@@ -11,15 +11,14 @@ const connection = mysql.createConnection({
 });
 
 router.get("/", (req, res) =>{
-    connection.query("SELECT product_name FROM product", function (error, results, fields) {
-        if (error != null) { console.log(error); return; }
-        var array = []        
-        results.forEach((item) => {
-            array.push(item.product_name);
-        })
-        res.render("pantry", {
+    connection.query("SELECT upc, product_name, brand FROM product", function (error, results, fields) {
+        if (error != null) { console.log(error);
+            return res.status(500).send("Database error");
+        }
+
+        return res.render("pantry", {
             title: "Pantry",
-            food_data: array
+            food_data: results
         });
     });
 
