@@ -21,8 +21,6 @@ router.get("/", (req, res) =>{
             food_data: results
         });
     });
-
-    
 });
 
 module.exports = router;
