@@ -4,6 +4,7 @@ var indexRouter = require("./routes/index.js");
 var recallsRouter = require("./routes/recalls.js");
 var pantryRouter = require("./routes/pantry.js");
 var settingsRouter = require("./routes/settings.js");
+var loginRouter = require("./routes/login.js");
 
 var app = express();
 app.set('views', 'views');
@@ -16,6 +17,7 @@ app.use('/', indexRouter);
 app.use('/recalls', recallsRouter);
 app.use('/pantry', pantryRouter);
 app.use('/settings', settingsRouter);
+app.use('/login', loginRouter);
 
 
 // Start the server
