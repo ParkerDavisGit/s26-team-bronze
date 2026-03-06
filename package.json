@@ -1,13 +1,24 @@
 {
 
   "scripts": {
+
     "start": "node server.js",
+
     "test": "echo \"Error: no test specified\" && exit 1"
+
   },
 
   "dependencies": {
+
+    "bootswatch": "^5.3.8",
+
     "ejs": "^4.0.1",
+
     "express": "^5.2.1",
+
     "mysql": "^2.18.1"
+
   }
+
 }
+
