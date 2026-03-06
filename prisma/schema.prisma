@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model InventoryItems {
+  item_id    Int      @id
+  product_id Int
+  user_id    Int
+  date_added DateTime
+  price      Float
+}
+
+model Products {
+  product_id   Int     @id
+  upc          BigInt
+  product_name String
+  brand        String
+  image_link   String?
+}
+
+model Recalls {
+  recall_id        Int      @id
+  product_id       Int
+  is_active        Int
+  description      String
+  date             DateTime
+  company          String
+  regions          String
+  amount_sick      Int
+  amount_dead      Int
+  product_keywords String
+  classification   String
+}
+
+model Users {
+  user_id         Int    @id
+  first_name      String
+  last_name       String
+  email           String
+  password        String
+  has_premium     Int
+  free_scans_left Int?
+}
