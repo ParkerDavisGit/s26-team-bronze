@@ -85,6 +85,18 @@
   <% } %>
 </div>
 
+<div class="container d-flex justify-content-center mt-4 mb-4">
+  <div>
+    <% if (currentPage > 1) { %>
+      <a class="btn btn-outline-light me-2" href="/?page=<%= currentPage - 1 %>">Previous</a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+      <a class="btn btn-outline-light" href="/?page=<%= currentPage + 1 %>">Next</a>
+    <% } %>
+  </div>
+</div>
+
 
   <!-- Recall 1 -->
   <!-- <div class="container" style="display: flex; justify-content: center;">
