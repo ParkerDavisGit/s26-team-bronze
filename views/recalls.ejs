@@ -6,95 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- <title>Spoiler Alert Homepage</title> -->
      <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="css/bootstrap.css" rel="stylesheet">
   
   </head>
   
   <body>
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#"><%= title %></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/pantry">Pantry</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/settings">Settings</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black">
+      <div class="container-fluid">
+        <a class="navbar-brand" style="color: #EAA221" href="#"><%= title %></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/pantry">Pantry</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/settings">Settings</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/login">Log In</a>
+            </li>
           </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" style="border-color: #EAA221;" type="search" placeholder="Search" aria-label="Search"/>
+            <button class="btn" style="border-color: #EAA221; color: #EAA221" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
 
 <div class = "container">
-    <h1><%= title %></h1>
-    <h1>Hello, how are you.</h1>
-    <p>I am under the water.<br>
-      Please help me.<br>
-      Here too much raining.</p>
+        <h1><%= title %></h1>
+        <h1>Hello, how are you.</h1>
+        <p>I am under the water.<br>
+          Please help me.<br>
+          Here too much raining.</p>
+          <h3>Your recalls appear here!</h3>
+    </div>
 
-      <h3>Your recalls appear here!</h3>
+    <!-- Login Modal -->
+    <div class="modal fade"
+          id="loginRequiredModal"
+          tabindex="-1"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color:black; --bs-modal-border-color:#EAA221;">
 
-      <% if (!recall_data || recall_data.length === 0) { %>
-        <p>No recalls found.</p>
-      <% } else { %>
-        <% recall_data.forEach(recall => { %>
-        <div class = "card">
-          <div class = "card-header">
-            Recalled on <%= recall.recall_date %>
+          <div class="modal-header" >
+            <h3 class="modal-title" style="color:#EAA221;">Login Required</h3>
           </div>
-          <div class = "card-body">
-            <p><strong>Brand:</strong> <%= recall.company %></p>
-            <p><strong>Item:</strong> <%= recall.product_name %></p>
-            <p><strong>Description:</strong> <%= recall.description %></p>
 
-            <button class = "btn btn-primary" 
-                    type = "button" 
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#recallDetails<%= recall.recall_id %>">
-              View Details
-            </button>
-            <div class = "collapse"
-                  id = "recallDetails<%= recall.recall_id %>">
-              <div class = "card-body">
-                <p><strong>Classification:</strong> <%= recall.classification %></p>
-                <p><strong>People Affected:</strong> <%= recall.amount_sick %></p>
-                <p><strong>Deaths:</strong> <%= recall.amount_dead %></p>
-                <p><strong>Region:</strong> <%= recall.regions %></p>
-              </div>
-            </div>
+          <div class="modal-body">
+            <p style="color:#EAA221;">You must be logged in to view this page.</p>
           </div>
+
+          <div class="modal-footer">
+            <a href="/" class="btn btn-outline-light" style="color:#EAA221; --bs-btn-border-color: #EAA221;">Return Home</a>
+            <a href="/login" class="btn btn-warning" style="color: black;">Log In</a>
+          </div>
+
         </div>
-        <% }) %>
-      <% } %>
+      </div>
+    </div>
 
-</div>
+    <script>
+      window.onload = function () {
+        const modal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+        modal.show();
+      };
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   
   </body>

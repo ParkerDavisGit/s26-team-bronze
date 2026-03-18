@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("数据库查询失败:", error);
+        console.error("Database query failed:", error);
         return res.status(500).send("Database error");
     }
 });
