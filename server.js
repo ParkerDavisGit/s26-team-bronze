@@ -7,6 +7,7 @@ const recallsRoutes = require('./routes/recalls');
 const settingsRoutes = require('./routes/settings');
 const usersRoutes = require('./routes/users');
 const loginRoutes = require('./routes/login');
+const registerRoutes = require('./routes/register');
 
 const app = express();
 const PORT = 3000;
@@ -30,6 +31,7 @@ app.use('/recalls', recallsRoutes);
 app.use('/settings', settingsRoutes);
 app.use('/users', usersRoutes);
 app.use('/login', loginRoutes);
+app.use('/register', registerRoutes);
 
 //start the server
 app.listen(PORT, () => {
