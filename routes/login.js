@@ -21,6 +21,9 @@ router.post('/', async (req, res) => {
             return res.render("login", { title: "Log In", error: "Incorrect password." });
         }
 
+        // Store user ID in session
+        req.session.userId = user.user_id;
+
         console.log("Login successful for:", user.email);
         res.redirect('/');
 

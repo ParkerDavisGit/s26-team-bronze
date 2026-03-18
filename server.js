@@ -8,12 +8,19 @@ const settingsRoutes = require('./routes/settings');
 const usersRoutes = require('./routes/users');
 const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
+const session = require('express-session');
 
 const app = express();
 const PORT = 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
+
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false
+}));
 
 app.use(express.static('public'));
 app.use(express.json());
