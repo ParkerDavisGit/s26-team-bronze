@@ -5,7 +5,6 @@ const indexRoutes = require('./routes/index');
 const pantryRoutes = require('./routes/pantry');
 const recallsRoutes = require('./routes/recalls');
 const settingsRoutes = require('./routes/settings');
-const usersRoutes = require('./routes/users');
 const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
 const session = require('express-session');
@@ -26,19 +25,23 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// define the home route
-// app.get('/', (req, res) => {
-//   res.render('index', { title: 'Home' });
-// });
-
 // use the routes
 app.use('/', indexRoutes); // this is the first page
 app.use('/pantry', pantryRoutes);
 app.use('/recalls', recallsRoutes);
 app.use('/settings', settingsRoutes);
-app.use('/users', usersRoutes);
 app.use('/login', loginRoutes);
 app.use('/register', registerRoutes);
+
+// Route to handle user logout
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session:", err);
+        }
+        res.redirect('/');
+    });
+});
 
 //start the server
 app.listen(PORT, () => {

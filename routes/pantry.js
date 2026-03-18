@@ -4,6 +4,8 @@ const prisma = require('../db');
 
 router.get("/", async (req, res) => {
     try {
+        const isLoggedIn = req.session.userId ? true : false;
+
         const perPage = 3;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
@@ -35,7 +37,8 @@ router.get("/", async (req, res) => {
             title: "Pantry",
             food_data: results,
             currentPage: page,
-            totalPages: totalPages
+            totalPages: totalPages,
+            isLoggedIn: isLoggedIn
         });
 
     } catch (error) {
