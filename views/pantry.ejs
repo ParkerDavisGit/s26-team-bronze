@@ -6,60 +6,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- <title>Spoiler Alert Homepage</title> -->
      <title><%= title %></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="css/bootstrap.css" rel="stylesheet">
   
   </head>
   
-  <body>
+  <body style="background: linear-gradient(#00000080, #00000080), url(/assets/img/bg-img-3.jpg) center/cover no-repeat fixed;">
 
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#"><%= title %></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/recalls">Recalls</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/settings">Settings</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black">
+      <div class="container-fluid">
+        <a class="navbar-brand" style="color: #EAA221" href="#"><%= title %></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/recalls">Recalls</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color: #EAA221" href="/settings">Settings</a>
+            </li>
+            <% if (!isLoggedIn) { %>
+              <li class="nav-item">
+                <a class="nav-link" style="color: #EAA221" href="/login">Log In</a>
+              </li>
+            <% } else { %>
+              <li class="nav-item">
+                <a class="nav-link" style="color: #EAA221" href="/logout">Log Out</a>
+              </li>
+            <% } %>
           </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" style="border-color: #EAA221;" type="search" placeholder="Search" aria-label="Search"/>
+            <button class="btn" style="border-color: #EAA221; color: #EAA221" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+  <!-- Title -->
+  <div class = "container" style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
+    <h1 style="color: #EAA221; text-align: center; text-shadow: 2px 2px 3px black;"><%= title %></h1>
+  </div>
+
+    <!-- Banner -->
+  <div class = "container">
+    
+  </div>
+
+  <!-- Pantry Item List -->
+    <div class="container">
+    <% if (!food_data || food_data.length === 0) { %>
+      <p>No pantry items.</p>
+    <% } else { %>
+      <% food_data.forEach(product => { %>
+        <div class="container" style="display: flex; justify-content: center;">
+          <div class="card mb-3" style="width: 100vh; background-color: black; --bs-card-border-color: #EAA221">
+            <h3 class="card-header" style="color: #EAA221"><%= product.product_name %></h3>
+            <div class="card-body">
+              <h5 class="card-title" style="color: #EAA221">Brand: <%= product.brand %></h5>
+              <h6 class="card-subtitle" style="color: #EAA221">UPC: <%= product.upc %></h6>
+
+              <!-- Display Recall Information -->
+              <% if (product.recall_id != null) { %>
+                <button class="btn btn-outline-danger mt-3 mb-2"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#recallDetails<%= product.product_id %>"
+                        aria-expanded="false"
+                        aria-controls="recallDetails<%= product.product_id %>">
+                  Recall Alert
+                </button>
+
+                <div class="collapse" id="recallDetails<%= product.product_id %>">
+                  <div class="card-body border-top" style="--bs-border-color: #EAA221;">
+                    <p class="card-text" style="color: #EAA221">Recall Date: <%= product.recall_date %></p>
+                    <p class="card-text" style="color: #EAA221">Company: <%= product.company %></p>
+                    <p class="card-text" style="color: #EAA221">Classification: <%= product.classification %></p>
+                    <p class="card-text" style="color: #EAA221">Description: <%= product.description %></p>
+                    <p class="card-text" style="color: #EAA221">Regions: <%= product.regions %></p>
+                    <p class="card-text" style="color: #EAA221">People Affected: <%= product.amount_sick %></p>
+                    <p class="card-text" style="color: #EAA221">Deaths: <%= product.amount_dead %></p>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <!-- Pages Buttons -->
+  <div class="container d-flex justify-content-center mt-4 mb-4">
+    <div>
+      <% if (currentPage > 1) { %>
+        <a class="btn btn-primary me-2" 
+          style="color: black; background-color: #EAA221; --bs-btn-border-color: black;" 
+          href="/pantry?page=<%= currentPage - 1 %>">Previous
+        </a>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a class="btn btn-primary" 
+          style="color: black; background-color: #EAA221; --bs-btn-border-color: black;" 
+          href="/pantry?page=<%= currentPage + 1 %>">Next
+        </a>
+      <% } %>
     </div>
   </div>
-</nav>
 
-<div class = "container">
-    <h1><%= title %></h1>
-    <h1>Hello, how are you.</h1>
-    <p>I am under the water.<br>
-      Please help me.<br>
-      Here too much raining.</p>
-      <h3>Your registered purchases appear here!</h3>
-</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   
   </body>

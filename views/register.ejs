@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title><%= title %></title>
+        <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+        <link href="/css/styles.css" rel="stylesheet" />
+        <link href="/css/bootstrap.css" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" data-bs-theme="dark" style="z-index: 1030; border:none; box-shadow:none;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"><%= title %></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Recalls">Recalls</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/pantry">Pantry</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-sm-2" type="search" placeholder="Search">
+                    <button class="btn btn-secondary my-2 my-sm-0" style="background-color: #332701; border-color: #EAA221; color: #EAA221" type="submit">Search</button>
+                </form>
+                </div>
+            </div>
+        </nav>
+
+        <video class="bg-video" playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
+            <source src="/assets/mp4/family-dinner.mp4" type="video/mp4" />
+        </video>
+
+        <div class="masthead">
+            <div class="masthead-content text-white">
+                <div class="container-fluid px-4 px-lg-0">
+                    <h1 style="color:#EAA221" class="fst-italic lh-1 mb-4">Register</h1>
+                    
+                    <form action="/register" method="POST">
+                        
+                        <% if (typeof error !== 'undefined') { %>
+                            <div class="alert alert-danger" style="padding: 10px; margin-bottom: 15px; border-radius: 5px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;">
+                                <%= error %>
+                            </div>
+                        <% } %>
+
+                        <div class="row mb-4">
+                            <div class="col">
+                                <div data-mdb-input-init class="form-outline">
+                                    <input type="text" id="firstName" class="form-control" name="first_name" required />
+                                    <label class="form-label" for="firstName">First name</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div data-mdb-input-init class="form-outline">
+                                    <input type="text" id="lastName" class="form-control" name="last_name" required />
+                                    <label class="form-label" for="lastName">Last name</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input type="email" id="emailInput" class="form-control" name="email" required />
+                            <label class="form-label" for="emailInput">Email address</label>
+                        </div>
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input type="password" id="passwordInput" class="form-control" name="password" required />
+                            <label class="form-label" for="passwordInput">Password</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mb-4" style="background-color: #EAA221; border: none; color: black; font-weight: bold;">Sign Up</button>
+
+                        <div class="text-center">
+                            <p>Already a member? <a style="color:#EAA221" href="/login">Log in</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/scripts.js"></script>
+    </body>
+</html>
