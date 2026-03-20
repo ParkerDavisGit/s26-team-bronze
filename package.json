@@ -20,6 +20,7 @@
     "express-session": "^1.19.0"
   },
   "devDependencies": {
-    "prisma": "^7.4.2"
+    "@types/node": "^25.5.0",
+    "prisma": "^7.5.0"
   }
 }
