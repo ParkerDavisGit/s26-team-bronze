@@ -5,6 +5,10 @@ const prisma = require('../db');
 router.get("/", async (req, res) => {
     try {
         const isLoggedIn = req.session.userId ? true : false;
+        
+        if (!isLoggedIn) {
+            return
+        }
 
         const perPage = 3;
         const page = parseInt(req.query.page) || 1;
@@ -30,6 +34,9 @@ router.get("/", async (req, res) => {
             FROM products AS p
             LEFT JOIN recalls AS r
               ON p.product_id = r.product_id
+            INNER JOIN InventoryItems as i
+              ON p.product_id = i.product_id
+            WHERE i.user_id = ${req.session.userId}
             LIMIT ${perPage} OFFSET ${offset}
         `;
 
