@@ -7,14 +7,24 @@ router.get("/", async (req, res) => {
         const isLoggedIn = req.session.userId ? true : false;
         
         if (!isLoggedIn) {
-            return
+            return res.render("pantry", {
+                title: "Pantry",
+                food_data: [],
+                currentPage: 1,
+                totalPages: 1,
+                isLoggedIn: false
+            });
         }
 
         const perPage = 3;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
 
-        const totalProducts = await prisma.products.count();
+        const totalProducts = await prisma.inventoryItems.count({
+            where: {
+                user_id: req.session.userId
+            }
+        });
         const totalPages = Math.ceil(totalProducts / perPage);
 
         const results = await prisma.$queryRaw`
@@ -45,7 +55,7 @@ router.get("/", async (req, res) => {
             food_data: results,
             currentPage: page,
             totalPages: totalPages,
-            isLoggedIn: isLoggedIn
+            isLoggedIn: true
         });
 
     } catch (error) {
