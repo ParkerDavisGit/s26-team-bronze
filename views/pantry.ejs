@@ -55,7 +55,7 @@
 
   <!-- Search Bar with Button -->
   <div class = "container" style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
-    <form method="POST">
+    <form action="/pantry/add" method="POST">
       <div class="input-group mb-3" style="max-width: 400px; margin: 0 auto;">
         <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" name="upc" class="form-control" placeholder="Enter UPC to Add to Pantry" aria-label="UPC Lookup" required>
         <button class="btn btn-primary" type="submit" style="color: #EAA221; border-color: #EAA221; background-color: black;" id="button-addon2">Add</button>
@@ -77,14 +77,22 @@
         <% food_data.forEach(product => { %>
           <div class="container" style="display: flex; justify-content: center;">
             <div class="card mb-3" style="width: 100vh; background-color: black; --bs-card-border-color: #EAA221">
-              <h3 class="card-header" style="color: #EAA221"><%= product.product_name %></h3>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 style="color: #EAA221"><%= product.product_name %></h3>
+                <form action="/pantry/remove" method="POST" style="margin: 0;">
+                    <input type="hidden" name="item_id" value="<%= product.item_id %>">
+                    <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Remove this item?')">
+                      ✕
+                    </button>
+                  </form>
+                </div>
               <div class="card-body">
                 <h5 class="card-title" style="color: #EAA221">Brand: <%= product.brand %></h5>
                 <h6 class="card-subtitle" style="color: #EAA221">UPC: <%= product.upc %></h6>
 
                 <!-- Display Recall Information -->
                 <% if (product.recall_id != null) { %>
-                  <button class="btn btn-outline-danger mt-3 mb-2"
+                  <button class="btn btn-danger mt-3 mb-2"
                           type="button"
                           data-bs-toggle="collapse"
                           data-bs-target="#recallDetails<%= product.product_id %>"

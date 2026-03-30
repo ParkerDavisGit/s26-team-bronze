@@ -29,6 +29,7 @@ router.get("/", async (req, res) => {
 
         const results = await prisma.$queryRaw`
             SELECT 
+                i.item_id,
                 p.product_id,
                 p.upc, 
                 p.product_name, 
@@ -67,7 +68,7 @@ router.get("/", async (req, res) => {
 
 
 // Adding an item to the pantry
-router.post("/", async (req, res) => {
+router.post("/add", async (req, res) => {
     try {
         const { upc } = req.body;
 
@@ -81,7 +82,7 @@ router.post("/", async (req, res) => {
             where: { upc: upc },
         });
 
-        if (Object.keys(existingProducts).length < 2) {
+        if (!existingProducts) {
             console.log("New item failed to add: ", upc);
 
             res.redirect('/pantry');
@@ -105,6 +106,33 @@ router.post("/", async (req, res) => {
         res.redirect('/pantry');
     } catch (error) {
         console.error("Login Error:", error);
+        // Should have an onscreen error here
+        //res.render("login", { title: "Log In", error: "An internal server error occurred." });
+    }
+});
+
+// Removing an item from the pantry
+router.post("/remove", async (req, res) => {
+    try {
+        const { item_id } = req.body;
+
+        if (!item_id) {
+            console.error("No item_id provided for removal.");
+            return res.redirect('/pantry');
+        }
+
+        await prisma.inventoryItems.delete({
+            where: {
+                item_id: parseInt(item_id)
+            }
+        });
+
+        console.log("Item removed successfully:", item_id);
+
+        res.redirect('/pantry');
+
+    } catch (error) {
+        console.error("Error removing item:", error);
         // Should have an onscreen error here
         //res.render("login", { title: "Log In", error: "An internal server error occurred." });
     }
