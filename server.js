@@ -8,6 +8,7 @@ const settingsRoutes = require('./routes/settings');
 const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
 const session = require('express-session');
+const verifyRouter = require('./routes/verify');
 
 const app = express();
 const PORT = 3000;
@@ -32,6 +33,7 @@ app.use('/recalls', recallsRoutes);
 app.use('/settings', settingsRoutes);
 app.use('/login', loginRoutes);
 app.use('/register', registerRoutes);
+app.use('/verify', verifyRouter);
 
 // Route to handle user logout
 app.get('/logout', (req, res) => {

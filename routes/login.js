@@ -3,7 +3,16 @@ const router = express.Router();
 const prisma = require('../db'); 
 
 router.get('/', (req, res) =>{
-    res.render("login", { title: "Log In" });
+    let successMessage = null;
+    
+    if (req.query.registered === 'true') {
+        successMessage = "Registration successful! Please check your email to verify your account.";
+    }
+
+    res.render("login", { 
+        title: "Log In", 
+        success: successMessage
+    });
 });
 
 router.post('/', async (req, res) => {
@@ -14,11 +23,21 @@ router.post('/', async (req, res) => {
         });
 
         if (!user) {
-            return res.render("login", { title: "Log In", error: "User not found. Please try again." });
+            return res.render("login", 
+                { title: "Log In", 
+                    error: "User not found. Please try again." });
         }
 
         if (user.password !== password) {
-            return res.render("login", { title: "Log In", error: "Incorrect password." });
+            return res.render("login", 
+                { title: "Log In", 
+                    error: "Incorrect password." });
+        }
+
+        if (!user.is_verified) {
+            return res.render("login", 
+                { title: "Log In", 
+                    error: "Please verify your email before logging in." });
         }
 
         // Store user ID in session
@@ -29,7 +48,9 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
         console.error("Login Error:", error);
-        res.render("login", { title: "Log In", error: "An internal server error occurred." });
+        res.render("login", 
+            { title: "Log In", 
+                error: "An internal server error occurred." });
     }
 });
 

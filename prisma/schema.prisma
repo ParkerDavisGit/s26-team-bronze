@@ -40,11 +40,14 @@ model Recalls {
 }
 
 model Users {
-  user_id         Int    @id
-  first_name      String
-  last_name       String
-  email           String
-  password        String
-  has_premium     Int
-  free_scans_left Int?
+  user_id           Int     @id 
+  first_name        String
+  last_name         String
+  email             String  @unique
+  password          String
+  has_premium       Int     @default(0)
+  free_scans_left   Int     @default(5)
+  
+  is_verified       Boolean @default(false)
+  verification_token String?
 }
