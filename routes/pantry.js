@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
             });
         }
 
-        const perPage = 3;
+        const perPage = 10;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
 
@@ -47,6 +47,7 @@ router.get("/", async (req, res) => {
             INNER JOIN InventoryItems as i
               ON p.product_id = i.product_id
             WHERE i.user_id = ${req.session.userId}
+            ORDER BY i.item_id DESC
             LIMIT ${perPage} OFFSET ${offset}
         `;
 
