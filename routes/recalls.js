@@ -4,16 +4,40 @@ const prisma = require('../db');
 
 router.get('/', async (req, res) => {
   try {
-    const allRecalls = await prisma.recalls.findMany();
-    
-    // Check if the session has a userId
-    const isLoggedIn = req.session.userId ? true : false;
+        const isLoggedIn = req.session.userId ? true : false;
+        
+        const perPage = 10;
+        const page = parseInt(req.query.page) || 1;
+        const offset = (page - 1) * perPage;
 
-    res.render('recalls', { 
-      title: 'Recalls',
-      recall_data: allRecalls,
-      isLoggedIn: isLoggedIn  // Pass this boolean to the frontend
-    });
+        const totalRecalls = await prisma.recalls.count();
+        const totalPages = Math.ceil(totalRecalls / perPage);
+
+        const results = await prisma.$queryRaw`
+            SELECT 
+                r.recall_id,
+                r.description,
+                DATE(r.date) AS recall_date, 
+                r.company,
+                r.regions,
+                r.amount_sick,
+                r.amount_dead,
+                r.classification,
+                p.product_name
+            FROM recalls AS r
+            JOIN products AS p 
+              ON p.product_id = r.product_id
+            ORDER BY r.date DESC
+            LIMIT ${perPage} OFFSET ${offset}
+        `;
+
+        return res.render("recalls", {
+            title: "Recalls",
+            recall_data: results,
+            currentPage: page,
+            totalPages: totalPages,
+            isLoggedIn: isLoggedIn
+        });
     
   } catch (error) {
     console.error("Database error:", error);
