@@ -11,7 +11,7 @@ model InventoryItems {
   item_id    Int      @id
   product_id Int
   user_id    Int
-  date_added DateTime
+  date_added DateTime @default(now())
   price      Float
 }
 
