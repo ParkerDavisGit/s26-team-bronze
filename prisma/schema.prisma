@@ -8,25 +8,30 @@ datasource db {
 }
 
 model InventoryItems {
-  item_id    Int      @id
+  item_id    Int      @id @default(autoincrement())
+  product    Products @relation(fields: [product_id], references: [product_id])
   product_id Int
+  user       Users    @relation(fields: [user_id], references: [user_id])
   user_id    Int
   date_added DateTime @default(now())
   price      Float
 }
 
 model Products {
-  product_id   Int     @id
+  product_id   Int     @id @default(autoincrement())
   upc          BigInt
   product_name String
   brand        String
   image_link   String?
+  items        InventoryItems[]
+  recalls      Recalls[]
 }
 
 model Recalls {
-  recall_id        Int      @id
+  recall_id        Int      @id @default(autoincrement())
+  product          Products @relation(fields: [product_id], references: [product_id])
   product_id       Int
-  is_active        Int
+  is_active        Boolean
   description      String
   date             DateTime
   company          String
@@ -37,12 +42,13 @@ model Recalls {
   classification   String
 }
 
-model Users {
-  user_id         Int    @id
+model Users { 
+  user_id         Int    @id @default(autoincrement())
   first_name      String
   last_name       String
   email           String
   password        String
-  has_premium     Int
+  has_premium     Boolean
   free_scans_left Int?
+  items           InventoryItems[]
 }

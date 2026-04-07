@@ -27,30 +27,68 @@ router.get("/", async (req, res) => {
         });
         const totalPages = Math.ceil(totalProducts / perPage);
 
-        const results = await prisma.$queryRaw`
-            SELECT 
-                i.item_id,
-                p.product_id,
-                p.upc, 
-                p.product_name, 
-                p.brand,
-                r.recall_id,
-                r.description,
-                DATE(r.date) AS recall_date,
-                r.company,
-                r.regions,
-                r.amount_sick,
-                r.amount_dead,
-                r.classification
-            FROM products AS p
-            LEFT JOIN recalls AS r
-              ON p.product_id = r.product_id
-            INNER JOIN InventoryItems as i
-              ON p.product_id = i.product_id
-            WHERE i.user_id = ${req.session.userId}
-            ORDER BY i.item_id DESC
-            LIMIT ${perPage} OFFSET ${offset}
-        `;
+        // const old_results = await prisma.$queryRaw`
+        //     SELECT 
+        //         i.item_id,
+        //         p.product_id,
+        //         p.upc, 
+        //         p.product_name, 
+        //         p.brand,
+        //         r.recall_id,
+        //         r.description,
+        //         DATE(r.date) AS recall_date,
+        //         r.company,
+        //         r.regions,
+        //         r.amount_sick,
+        //         r.amount_dead,
+        //         r.classification
+        //     FROM products AS p
+        //     LEFT JOIN recalls AS r
+        //       ON p.product_id = r.product_id
+        //     INNER JOIN InventoryItems as i
+        //       ON p.product_id = i.product_id
+        //     WHERE i.user_id = ${req.session.userId}
+        //     ORDER BY i.item_id DESC
+        //     LIMIT ${perPage} OFFSET ${offset}
+        // `;
+
+        const results = await prisma.inventoryItems.findMany({
+            select: {
+                item_id: true,
+                product: {
+                    select: {
+                        product_id: true,
+                        upc: true,
+                        product_name: true,
+                        brand: true,
+                        recalls: {
+                            select: {
+                                recall_id: true,
+                                description: true,
+                                date: true,
+                                company: true,
+                                regions: true,
+                                amount_sick: true,
+                                amount_dead: true,
+                                classification: true
+                            }
+                        }
+                    }
+                },
+            },
+            where: {
+                user_id: req.session.userId
+            },
+            orderBy: {
+                item_id: "desc"
+            },
+            take: perPage,
+            skip: offset
+        });
+
+        console.log(results);
+        console.log("\n\n")
+        //console.log(old_results)
 
         return res.render("pantry", {
             title: "Pantry",
