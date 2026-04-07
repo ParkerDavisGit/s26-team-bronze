@@ -74,42 +74,42 @@
       <% if (!food_data || food_data.length === 0) { %>
         <p>No pantry items.</p>
       <% } else { %>
-        <% food_data.forEach(product => { %>
+        <% food_data.forEach(item => { %>
           <div class="container" style="display: flex; justify-content: center;">
             <div class="card mb-3" style="width: 100vh; background-color: black; --bs-card-border-color: #EAA221">
               <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 style="color: #EAA221"><%= product.product_name %></h3>
+                <h3 style="color: #EAA221"><%= item.product.product_name %></h3>
                 <form action="/pantry/remove" method="POST" style="margin: 0;">
-                    <input type="hidden" name="item_id" value="<%= product.item_id %>">
+                    <input type="hidden" name="item_id" value="<%= item.item_id %>">
                     <button class="btn btn-outline-danger" type="submit" onclick="return confirm('Remove this item?')">
                       ✕
                     </button>
                   </form>
                 </div>
               <div class="card-body">
-                <h5 class="card-title" style="color: #EAA221">Brand: <%= product.brand %></h5>
-                <h6 class="card-subtitle" style="color: #EAA221">UPC: <%= product.upc %></h6>
+                <h5 class="card-title" style="color: #EAA221">Brand: <%= item.product.brand %></h5>
+                <h6 class="card-subtitle" style="color: #EAA221">UPC: <%= item.product.upc %></h6>
 
                 <!-- Display Recall Information -->
-                <% if (product.recall_id != null) { %>
+                <% if (item.product.recalls.length != 0) { %>
                   <button class="btn btn-danger mt-3 mb-2"
                           type="button"
                           data-bs-toggle="collapse"
-                          data-bs-target="#recallDetails<%= product.product_id %>"
+                          data-bs-target="#recallDetails<%= item.product.product_id %>"
                           aria-expanded="false"
-                          aria-controls="recallDetails<%= product.product_id %>">
+                          aria-controls="recallDetails<%= item.product.product_id %>">
                     Recall Alert
                   </button>
 
-                  <div class="collapse" id="recallDetails<%= product.product_id %>">
+                  <div class="collapse" id="recallDetails<%= item.product.product_id %>">
                     <div class="card-body border-top" style="--bs-border-color: #EAA221;">
-                      <p class="card-text" style="color: #EAA221">Recall Date: <%= product.recall_date %></p>
-                      <p class="card-text" style="color: #EAA221">Company: <%= product.company %></p>
-                      <p class="card-text" style="color: #EAA221">Classification: <%= product.classification %></p>
-                      <p class="card-text" style="color: #EAA221">Description: <%= product.description %></p>
-                      <p class="card-text" style="color: #EAA221">Regions: <%= product.regions %></p>
-                      <p class="card-text" style="color: #EAA221">People Affected: <%= product.amount_sick %></p>
-                      <p class="card-text" style="color: #EAA221">Deaths: <%= product.amount_dead %></p>
+                      <p class="card-text" style="color: #EAA221">Recall Date: <%= item.product.recalls[0].recall_date %></p>
+                      <p class="card-text" style="color: #EAA221">Company: <%= item.product.recalls[0].company %></p>
+                      <p class="card-text" style="color: #EAA221">Classification: <%= item.product.recalls[0].classification %></p>
+                      <p class="card-text" style="color: #EAA221">Description: <%= item.product.recalls[0].description %></p>
+                      <p class="card-text" style="color: #EAA221">Regions: <%= item.product.recalls[0].regions %></p>
+                      <p class="card-text" style="color: #EAA221">People Affected: <%= item.product.recalls[0].amount_sick %></p>
+                      <p class="card-text" style="color: #EAA221">Deaths: <%= item.product.recalls[0].amount_dead %></p>
                     </div>
                   </div>
                 <% } %>
