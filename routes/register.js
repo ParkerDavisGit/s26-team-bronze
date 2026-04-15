@@ -10,6 +10,11 @@ router.post('/', async (req, res) => {
     try {
         const { first_name, last_name, email, password } = req.body;
 
+        //Normalize input
+        first_name = first_name.trim();
+        last_name = last_name.trim();
+        email = email.trim().toLowerCase();
+
         // 1. Check if the email already exists in the database
         const existingUser = await prisma.users.findFirst({
             where: { email: email }

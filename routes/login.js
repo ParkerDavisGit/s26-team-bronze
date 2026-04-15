@@ -8,17 +8,19 @@ router.get('/', (req, res) =>{
 
 router.post('/', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
+
+        email = email.trin().toLowerCase();
+
         const user = await prisma.users.findFirst({
             where: { email: email }
         });
 
-        if (!user) {
-            return res.render("login", { title: "Log In", error: "User not found. Please try again." });
-        }
-
-        if (user.password !== password) {
-            return res.render("login", { title: "Log In", error: "Incorrect password." });
+        if (!user || user.password !== password) {
+            return res.render("login", {
+                title: "Log In",
+                error: "Incorrect email or password."
+            });
         }
 
         // Store user ID in session

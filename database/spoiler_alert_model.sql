@@ -54,10 +54,10 @@ INSERT INTO Users (user_id, first_name, last_name, email, password, has_premium,
 VALUES(2, 'Miko', 'Nakadai', 'nakadai@yahoo.com', 'bulkhead10132', TRUE, 0);
 
 INSERT INTO Users (user_id, first_name, last_name, email, password, has_premium, free_scans_left)
-VALUES(3, 'Sōji', 'Yoshikawa', 'Soshi@gmail.com', 'optimus03$', FALSE, 13);
+VALUES(3, 'Sōji', 'Yoshikawa', 'soshi@gmail.com', 'optimus03$', FALSE, 13);
 
 INSERT INTO Users (user_id, first_name, last_name, email, password, has_premium, free_scans_left)
-VALUES(4, 'Rafael ', 'Esquivel', 'Rafbee@gmail.com', 'bumble!02', TRUE, 0);
+VALUES(4, 'Rafael ', 'Esquivel', 'rafbee@gmail.com', 'bumble!02', TRUE, 0);
 
 INSERT INTO Users (user_id, first_name, last_name, email, password, has_premium, free_scans_left)
 VALUES(5, 'Jack', 'Darby', 'jaxmotors@gmail.com', 'arcee!2006', FALSE, 5);
