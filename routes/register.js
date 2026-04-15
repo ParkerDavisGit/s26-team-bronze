@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { first_name, last_name, email, password } = req.body;
+        let { first_name, last_name, email, password } = req.body;
 
         //Normalize input
         first_name = first_name.trim();
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
         console.log("New user registered successfully:", newUser.email);
 
         // 4. Redirect to login page after successful registration
-        res.redirect('/login');
+        res.redirect('/login?registered=1');
 
     } catch (error) {
         console.error("Registration Error:", error);
