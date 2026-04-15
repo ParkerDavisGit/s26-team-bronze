@@ -18,6 +18,20 @@
           linear-gradient(#00000080, #000000BF),
           url(/assets/img/bg-img-1.jpg) center/cover no-repeat fixed;
       }
+
+      .recall-toggle .btn {
+        background-color: white;   /* Bootstrap primary blue */
+        border-color: black;
+        color: black;
+        opacity: 0.75;
+      }
+
+      .recall-toggle .btn-check:checked + .btn {
+        background-color: #EAA221;
+        border-color: black;
+        color: black;
+        opacity: 1;
+      }
     </style>
 
   </head>
@@ -59,8 +73,34 @@
     </nav>
 
 <!-- Title -->
-  <div class = "container" style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
+  <div class = "container" style="margin-top: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
     <h1 style="color: #EAA221; text-align: center; text-shadow: 2px 2px 3px black;"><%= title %></h1>
+    
+  </div>
+
+
+  <!-- Switch between all recalls and your personal recalls. -->
+  <div class = "container text-center" style="margin-top: 25px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
+    <% if (isLoggedIn) { %>
+      <div class = "btn-group recall-toggle" role = "group" aria-label = "Recall View Toggle">
+        <input type = "radio" class = "btn-check" name = "recallView"
+                id = "allRecallsRadio" autocomplete = "off"
+                <%= (!my_recall_data || my_recall_data.length === 0) ? "checked" : "" %>>
+        <label class = "btn btn-light" for = "allRecallsRadio">
+          All Recalls
+        </label>
+        <input type = "radio" class = "btn-check" name = "recallView"
+                id = "myRecallsRadio" autocomplete = "off"
+                <%= (my_recall_data && my_recall_data.length > 0) ? "checked" : "" %>>
+        <label class = "btn btn-light" for = "myRecallsRadio">
+          My Recalls
+        </label>
+      </div>
+    <% } else { %>
+      <p class = "text-light text-center">
+        <a href="/login" style="color: #EAA221;">Log in</a> to view personalized recalls based on your pantry items and saved filters.
+      </p>
+    <% } %>
   </div>
 
     <!-- Banner -->
@@ -69,13 +109,13 @@
   </div>
 
   <!-- All Recalls -->
-  <div class="container">
+  <div class="container" id = "allRecallsSection">
     <% if (!recall_data || recall_data.length === 0) { %>
       <p>No recalls found.</p>
     <% } else { %>
       <% recall_data.forEach(recall => { %>
         <div class="container" style="display: flex; justify-content: center;">
-          <div class="card mb-3" style="width: 100vh;">
+          <div class="card mb-3" style="width: 100%; max-width: 900px;">
             <h3 class="card-header"><%=recall.recall_date %></h3>
             <div class="card-body">
               <h5 class="card-title"><%= recall.company %></h5>
@@ -84,10 +124,10 @@
               <button class = "btn btn-outline-secondary mt-3 mb-3" 
                       type = "button" 
                       data-bs-toggle="collapse" 
-                      data-bs-target="#recallDetails<%= recall.recall_id %>">
+                      data-bs-target="#allRecallDetails<%= recall.recall_id %>">
                 View Details
               </button>
-              <div class="collapse" id = "recallDetails<%= recall.recall_id %>">
+              <div class="collapse" id = "allRecallDetails<%= recall.recall_id %>">
                 <div class="card-body border-top">
                   <p class="card-text">Description: <%= recall.description %></p>
                   <p class="card-text">Regions: <%= recall.regions %></p>
@@ -101,6 +141,70 @@
       <% }) %>
     <% } %>
   </div>
+
+
+  <!-- My Recalls Section -->
+  <% if (isLoggedIn) { %>
+    <div class = "container d-none" id = "myRecallsSection">
+      <% if (!my_recall_data || my_recall_data.length === 0) { %>
+        <p class = "text-light text-center"> No recalls found.</p>
+      <% } else { %>
+        <% my_recall_data.forEach(recall => { %>
+          <div class = "container" style = "display: flex; justify-content: center;">
+            <div class = "card mb-3" style = "width: 100%; max-width: 900px;">
+              <h3 class = "card-header"><%= recall.recall_date %></h3>
+              <div class = "card-body">
+                <h5 class="card-title"><%= recall.company %></h5>
+                <h5 class="card-title"><%= recall.product_name %></h5>
+                <h6 class="card-subtitle text-muted"><%= recall.classification %></h6>
+                <button class = "btn btn-outline-secondary mt-3 mb-3" 
+                        type = "button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#myRecallDetails<%= recall.recall_id %>">
+                  View Details
+                </button>
+                <div class="collapse" id = "myRecallDetails<%= recall.recall_id %>">
+                  <div class="card-body border-top">
+                    <p class="card-text">Description: <%= recall.description %></p>
+                    <p class="card-text">Regions: <%= recall.regions %></p>
+                    <p class="card-text">People Affected: <%= recall.amount_sick %></p>
+                    <p class="card-text">Deaths: <%= recall.amount_dead %></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  <% } %>
+
+  <% if (isLoggedIn) { %>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const allRecallsRadio = document.getElementById("allRecallsRadio");
+        const myRecallsRadio = document.getElementById("myRecallsRadio");
+        const allRecallsSection = document.getElementById("allRecallsSection");
+        const myRecallsSection = document.getElementById("myRecallsSection");
+
+        function updateRecallView() {
+          if (allRecallsRadio.checked) {
+            allRecallsSection.classList.remove("d-none");
+            myRecallsSection.classList.add("d-none");
+          } else {
+            allRecallsSection.classList.add("d-none");
+            myRecallsSection.classList.remove("d-none");
+          }
+        }
+
+        updateRecallView();
+
+        allRecallsRadio.addEventListener("change", updateRecallView);
+        myRecallsRadio.addEventListener("change", updateRecallView);
+      });
+    </script>
+  <% } %>
+    
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
   
