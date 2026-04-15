@@ -39,6 +39,10 @@
               </li>
             <% } %>
           </ul>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" style="border-color: #EAA221;" type="search" placeholder="Search" aria-label="Search"/>
+            <button class="btn" style="border-color: #EAA221; color: #EAA221" type="submit">Search</button>
+          </form>
         </div>
       </div>
     </nav>
@@ -72,7 +76,7 @@
     <div class="container">
     <% if (isLoggedIn) { %>
       <% if (!food_data || food_data.length === 0) { %>
-        <p>No pantry items.</p>
+        <p class = "text-light text-center">No pantry items.</p>
       <% } else { %>
         <% food_data.forEach(item => { %>
           <div class="container" style="display: flex; justify-content: center;">

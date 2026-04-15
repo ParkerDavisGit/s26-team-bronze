@@ -111,7 +111,7 @@
   <!-- All Recalls -->
   <div class="container" id = "allRecallsSection">
     <% if (!recall_data || recall_data.length === 0) { %>
-      <p>No recalls found.</p>
+      <p class = "text-light text-center">No recalls found.</p>
     <% } else { %>
       <% recall_data.forEach(recall => { %>
         <div class="container" style="display: flex; justify-content: center;">
