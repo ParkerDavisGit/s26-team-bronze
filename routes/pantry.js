@@ -27,30 +27,68 @@ router.get("/", async (req, res) => {
         });
         const totalPages = Math.ceil(totalProducts / perPage);
 
-        const results = await prisma.$queryRaw`
-            SELECT 
-                i.item_id,
-                p.product_id,
-                p.upc, 
-                p.product_name, 
-                p.brand,
-                r.recall_id,
-                r.description,
-                DATE(r.date) AS recall_date,
-                r.company,
-                r.regions,
-                r.amount_sick,
-                r.amount_dead,
-                r.classification
-            FROM products AS p
-            LEFT JOIN recalls AS r
-              ON p.product_id = r.product_id
-            INNER JOIN InventoryItems as i
-              ON p.product_id = i.product_id
-            WHERE i.user_id = ${req.session.userId}
-            ORDER BY i.item_id DESC
-            LIMIT ${perPage} OFFSET ${offset}
-        `;
+        // const old_results = await prisma.$queryRaw`
+        //     SELECT 
+        //         i.item_id,
+        //         p.product_id,
+        //         p.upc, 
+        //         p.product_name, 
+        //         p.brand,
+        //         r.recall_id,
+        //         r.description,
+        //         DATE(r.date) AS recall_date,
+        //         r.company,
+        //         r.regions,
+        //         r.amount_sick,
+        //         r.amount_dead,
+        //         r.classification
+        //     FROM products AS p
+        //     LEFT JOIN recalls AS r
+        //       ON p.product_id = r.product_id
+        //     INNER JOIN InventoryItems as i
+        //       ON p.product_id = i.product_id
+        //     WHERE i.user_id = ${req.session.userId}
+        //     ORDER BY i.item_id DESC
+        //     LIMIT ${perPage} OFFSET ${offset}
+        // `;
+
+        const results = await prisma.inventoryItems.findMany({
+            select: {
+                item_id: true,
+                product: {
+                    select: {
+                        product_id: true,
+                        upc: true,
+                        product_name: true,
+                        brand: true,
+                        recalls: {
+                            select: {
+                                recall_id: true,
+                                description: true,
+                                date: true,
+                                company: true,
+                                regions: true,
+                                amount_sick: true,
+                                amount_dead: true,
+                                classification: true
+                            }
+                        }
+                    }
+                },
+            },
+            where: {
+                user_id: req.session.userId
+            },
+            orderBy: {
+                item_id: "desc"
+            },
+            take: perPage,
+            skip: offset
+        });
+
+        console.log(results);
+        console.log("\n\n")
+        //console.log(old_results)
 
         return res.render("pantry", {
             title: "Pantry",
@@ -67,47 +105,75 @@ router.get("/", async (req, res) => {
 });
 
 
-// Adding an item to the pantry
+// Adding an item to the pantry with Open Food Facts API integration
 router.post("/add", async (req, res) => {
     try {
         const { upc } = req.body;
 
-        const lastItem = await prisma.inventoryItems.findFirst({
-            orderBy: { item_id: 'desc' }
-        });
-
-        const nextItemId = lastItem ? lastItem.item_id + 1 : 1;
-
-        const existingProducts = await prisma.products.findFirst({
+        // 1. Check if the product already exists in the local database
+        let existingProduct = await prisma.products.findFirst({
             where: { upc: upc },
         });
 
-        if (!existingProducts) {
-            console.log("New item failed to add: ", upc);
+        // 2. If not, fetch it from the API
+        if (!existingProduct) {
+            console.log("Product not in local DB. Fetching from external API...", upc);
+            
+            const apiUrl = `https://world.openfoodfacts.net/api/v2/product/${upc}.json`;
+            const response = await fetch(apiUrl);
+            const apiData = await response.json();
 
-            res.redirect('/pantry');
+            // Status 1 means the product was found in the external database
+            if (apiData.status === 1) {
+                // Extract product details, provide fallback strings if null
+                const newProductName = apiData.product.product_name || "Unknown Product";
+                const newBrand = apiData.product.brands || "Unknown Brand";
 
-            return;
+                // Manually calculate the next product_id (Auto-increment workaround)
+                const lastProduct = await prisma.products.findFirst({
+                    orderBy: { product_id: 'desc' }
+                });
+                const nextProductId = lastProduct ? lastProduct.product_id + 1 : 1;
+
+                // Save this new product to the local Products table
+                existingProduct = await prisma.products.create({
+                    data: {
+                        product_id: nextProductId,
+                        upc: upc,
+                        product_name: newProductName,
+                        brand: newBrand
+                    }
+                });
+                
+                console.log("New product successfully saved to local database!");
+            } else {
+                // Product not found in external API either
+                console.log("Product not found in API. Adding failed for UPC:", upc);
+                return res.redirect('/pantry');
+            }
         }
 
-        console.log(existingProducts);
+        // 3. Add the product to the user's Pantry
+        const lastItem = await prisma.inventoryItems.findFirst({
+            orderBy: { item_id: 'desc' }
+        });
+        const nextItemId = lastItem ? lastItem.item_id + 1 : 1;
         
-        const itemToSave = await prisma.inventoryItems.create({
+        await prisma.inventoryItems.create({
             data: {
                 item_id: nextItemId,
-                product_id: existingProducts["product_id"],
+                product_id: existingProduct.product_id,
                 user_id: req.session.userId,
                 price: 0.0
             }
         });
 
-        console.log("New item added successfully:", upc);
-
+        console.log("New item added to pantry successfully:", upc);
         res.redirect('/pantry');
+
     } catch (error) {
-        console.error("Login Error:", error);
-        // Should have an onscreen error here
-        //res.render("login", { title: "Log In", error: "An internal server error occurred." });
+        console.error("Add to Pantry Error:", error);
+        res.redirect('/pantry');
     }
 });
 

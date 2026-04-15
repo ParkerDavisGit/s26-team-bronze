@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
                 last_name: last_name,
                 email: email,
                 password: password,
-                has_premium: 0,
+                has_premium: false,
                 free_scans_left: 5 
             }
         });
