@@ -39,7 +39,6 @@
               </li>
             <% } %>
           </ul>
-        </div>
       </div>
     </nav>
 
@@ -61,6 +60,22 @@
         <button class="btn btn-primary" type="submit" style="color: #EAA221; border-color: #EAA221; background-color: black;" id="button-addon2">Add</button>
       </div>
     </form>
+  </div>
+
+  <!-- Search Pantry Items -->
+  <div class = "container" style="margin-top: 30px; margin-bottom: 50px;">
+    <form action="/pantry" method="GET" class="d-flex justify-content-center">
+      <div class="input-group mb-3" style="max-width: 500px;">
+        <input type="text" name="search" class="form-control" placeholder="Search products by name or brand..." aria-label="Search products" value="<%= searchQuery %>">
+        <button class="btn btn-primary" type="submit" style="color: #EAA221; border-color: #EAA221; background-color: black;">Search</button>
+        <% if (searchQuery) { %>
+          <a href="/pantry" class="btn btn-outline-secondary" style="color: #EAA221; border-color: #EAA221;">Clear</a>
+        <% } %>
+      </div>
+    </form>
+    <% if (searchQuery) { %>
+      <p style="color: #EAA221; text-align: center;">Showing results for: <strong><%= searchQuery %></strong></p>
+    <% } %>
   </div>
 
   <!-- Banner -->
@@ -127,14 +142,14 @@
       <% if (currentPage > 1) { %>
         <a class="btn btn-primary me-2" 
           style="color: black; background-color: #EAA221; --bs-btn-border-color: black;" 
-          href="/pantry?page=<%= currentPage - 1 %>">Previous
+          href="/pantry?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>">Previous
         </a>
       <% } %>
 
       <% if (currentPage < totalPages) { %>
         <a class="btn btn-primary" 
           style="color: black; background-color: #EAA221; --bs-btn-border-color: black;" 
-          href="/pantry?page=<%= currentPage + 1 %>">Next
+          href="/pantry?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>">Next
         </a>
       <% } %>
     </div>

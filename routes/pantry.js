@@ -12,46 +12,39 @@ router.get("/", async (req, res) => {
                 food_data: [],
                 currentPage: 1,
                 totalPages: 1,
-                isLoggedIn: false
+                isLoggedIn: false,
+                searchQuery: ""
             });
         }
 
         const perPage = 10;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
+        const searchQuery = req.query.search || "";
+
+        // Build where clause for searching
+        let whereClause = {
+            user_id: req.session.userId
+        };
+
+        // If search query exists, add filter for product name or brand
+        if (searchQuery.trim()) {
+            whereClause.AND = [
+                {
+                    product: {
+                        OR: [
+                            { product_name: { contains: searchQuery } },
+                            { brand: { contains: searchQuery } }
+                        ]
+                    }
+                }
+            ];
+        }
 
         const totalProducts = await prisma.inventoryItems.count({
-            where: {
-                user_id: req.session.userId
-            }
+            where: whereClause
         });
         const totalPages = Math.ceil(totalProducts / perPage);
-
-        // const old_results = await prisma.$queryRaw`
-        //     SELECT 
-        //         i.item_id,
-        //         p.product_id,
-        //         p.upc, 
-        //         p.product_name, 
-        //         p.brand,
-        //         r.recall_id,
-        //         r.description,
-        //         DATE(r.date) AS recall_date,
-        //         r.company,
-        //         r.regions,
-        //         r.amount_sick,
-        //         r.amount_dead,
-        //         r.classification
-        //     FROM products AS p
-        //     LEFT JOIN recalls AS r
-        //       ON p.product_id = r.product_id
-        //     INNER JOIN InventoryItems as i
-        //       ON p.product_id = i.product_id
-        //     WHERE i.user_id = ${req.session.userId}
-        //     ORDER BY i.item_id DESC
-        //     LIMIT ${perPage} OFFSET ${offset}
-        // `;
-
         const results = await prisma.inventoryItems.findMany({
             select: {
                 item_id: true,
@@ -76,9 +69,7 @@ router.get("/", async (req, res) => {
                     }
                 },
             },
-            where: {
-                user_id: req.session.userId
-            },
+            where: whereClause,
             orderBy: {
                 item_id: "desc"
             },
@@ -95,7 +86,8 @@ router.get("/", async (req, res) => {
             food_data: results,
             currentPage: page,
             totalPages: totalPages,
-            isLoggedIn: true
+            isLoggedIn: true,
+            searchQuery: searchQuery
         });
 
     } catch (error) {
