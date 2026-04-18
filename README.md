@@ -1,7 +1,8 @@
 # s26-team-bronze
 
 # Requirements
-NodeJS:
+NodeJS,
+SQLite3
 
 # Installation
 run 'npm install' inside the directory.
