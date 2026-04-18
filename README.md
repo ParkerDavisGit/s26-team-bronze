@@ -6,7 +6,7 @@ SQLite3
 
 # Installation
 run 'npm install' inside the directory.
-Setup your local MySQL server. If you have difficulties, ask Parker D. for help.
+run 'npx prisma generate' to prepare the database schema.
 
 # Members
 
