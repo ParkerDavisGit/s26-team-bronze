@@ -50,5 +50,7 @@ model Users {
   password        String
   has_premium     Boolean
   free_scans_left Int?
+  verification_token String? 
+  is_verified       Boolean  @default(false)
   items           InventoryItems[]
 }

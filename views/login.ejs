@@ -56,7 +56,14 @@
                 <h1 style=color:#EAA221 class="fst-italic lh-1 mb-4">Log In</h1>
                 <form action="/login" method="POST">
 
-                    <% if (typeof error !=='undefined' ) { %>
+                    <% if (typeof success !== 'undefined' && success) { %>
+                        <div class="alert alert-success"
+                            style="padding: 10px; margin-bottom: 15px; border-radius: 5px; color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb;">
+                            Please check your email to verify your account.
+                        </div>
+                    <% } %>
+
+                    <% if (typeof error !=='undefined' && error ) { %>
                         <div class="alert alert-danger"
                             style="padding: 10px; margin-bottom: 15px; border-radius: 5px; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;">
                             <%= error %>

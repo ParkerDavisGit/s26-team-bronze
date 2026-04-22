@@ -3,7 +3,8 @@ const router = express.Router();
 const prisma = require('../db'); 
 
 router.get('/', (req, res) =>{
-    res.render("login", { title: "Log In" });
+    const success = req.query.success === 'true';
+    res.render("login", { title: "Log In", error: null, success: success });
 });
 
 router.post('/', async (req, res) => {
@@ -19,6 +20,11 @@ router.post('/', async (req, res) => {
 
         if (user.password !== password) {
             return res.render("login", { title: "Log In", error: "Incorrect password." });
+        }
+
+        // If the user's email is not verified, block the login
+        if (!user.is_verified) {
+            return res.render("login", { title: "Log In", error: "Please verify your email address before logging in." });
         }
 
         // Store user ID in session
