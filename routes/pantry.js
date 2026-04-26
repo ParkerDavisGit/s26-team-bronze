@@ -1,6 +1,40 @@
 const express = require("express");
 const router = express.Router();
-const prisma = require('../db'); 
+const prisma = require('../db');
+
+async function checkFDARecalls(upc, productId) {
+    const res = await fetch(`https://api.fda.gov/food/enforcement.json?search=product_description:%22${upc}%22&limit=10`);
+    const { results = [] } = await res.json();
+
+    let count = 0;
+    for (const r of results) {
+        const exists = await prisma.recalls.findFirst({
+            where: { description: r.reason_for_recall, company: r.recalling_firm }
+        });
+        if (exists) continue;
+
+        const year = r.report_date.substring(0, 4);
+        const month = r.report_date.substring(4, 6);
+        const day = r.report_date.substring(6, 8);
+
+        await prisma.recalls.create({
+            data: {
+                product_id: productId,
+                is_active: true,
+                description: r.reason_for_recall || 'No description provided',
+                recall_date: new Date(`${year}-${month}-${day}`),
+                company: r.recalling_firm,
+                regions: r.state || '',
+                amount_sick: 0,
+                amount_dead: 0,
+                product_keywords: '',
+                classification: r.classification || ''
+            }
+        });
+        count++;
+    }
+    return count;
+}
 
 router.get("/", async (req, res) => {
     try {
@@ -59,7 +93,7 @@ router.get("/", async (req, res) => {
                             select: {
                                 recall_id: true,
                                 description: true,
-                                date: true,
+                                recall_date: true,
                                 company: true,
                                 regions: true,
                                 amount_sick: true,
@@ -109,7 +143,7 @@ router.post("/add", async (req, res) => {
 
         // 1. Check if the product already exists in the local database
         let existingProduct = await prisma.products.findFirst({
-            where: { upc: BigInt(upc) },
+            where: { upc: String(upc) },
         });
 
         // 2. If not, fetch it from the API
@@ -136,7 +170,7 @@ router.post("/add", async (req, res) => {
                 existingProduct = await prisma.products.create({
                     data: {
                         product_id: nextProductId,
-                        upc: BigInt(upc),
+                        upc: String(upc),
                         product_name: newProductName,
                         brand: newBrand
                     }
@@ -165,6 +199,11 @@ router.post("/add", async (req, res) => {
                 price: 0.0
             }
         });
+
+        const recallCount = await checkFDARecalls(upc, existingProduct.product_id);
+        if (recallCount > 0) {
+            req.session.errorMessage = `⚠️ RECALL ALERT: The product you just added (${existingProduct.product_name}) has ${recallCount} active recall${recallCount > 1 ? 's' : ''}. Please check your pantry for details.`;
+        }
 
         console.log("New item added to pantry successfully:", upc);
         res.redirect('/pantry');

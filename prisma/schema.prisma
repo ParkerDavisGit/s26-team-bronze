@@ -19,7 +19,7 @@ model InventoryItems {
 
 model Products {
   product_id   Int     @id @default(autoincrement())
-  upc          BigInt
+  upc          String
   product_name String
   brand        String
   image_link   String?
@@ -33,7 +33,7 @@ model Recalls {
   product_id       Int
   is_active        Boolean
   description      String
-  date             DateTime
+  recall_date      DateTime
   company          String
   regions          String
   amount_sick      Int
