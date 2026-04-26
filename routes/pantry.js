@@ -4,7 +4,7 @@ const prisma = require('../db');
 
 router.get("/", async (req, res) => {
     try {
-        const isLoggedIn = req.session.userId ? true : false;
+        const isLoggedIn = !!req.session.userId;
         
         if (!isLoggedIn) {
             return res.render("pantry", {
@@ -13,7 +13,8 @@ router.get("/", async (req, res) => {
                 currentPage: 1,
                 totalPages: 1,
                 isLoggedIn: false,
-                searchQuery: ""
+                searchQuery: "",
+                error: ""
             });
         }
 
@@ -81,13 +82,17 @@ router.get("/", async (req, res) => {
         console.log("\n\n")
         //console.log(old_results)
 
+        const errorMessage = req.session.errorMessage || '';
+        delete req.session.errorMessage; // Clear after displaying
+
         return res.render("pantry", {
             title: "Pantry",
             food_data: results,
             currentPage: page,
             totalPages: totalPages,
             isLoggedIn: true,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            error: errorMessage
         });
 
     } catch (error) {
@@ -104,7 +109,7 @@ router.post("/add", async (req, res) => {
 
         // 1. Check if the product already exists in the local database
         let existingProduct = await prisma.products.findFirst({
-            where: { upc: upc },
+            where: { upc: BigInt(upc) },
         });
 
         // 2. If not, fetch it from the API
@@ -131,7 +136,7 @@ router.post("/add", async (req, res) => {
                 existingProduct = await prisma.products.create({
                     data: {
                         product_id: nextProductId,
-                        upc: upc,
+                        upc: BigInt(upc),
                         product_name: newProductName,
                         brand: newBrand
                     }
@@ -141,6 +146,7 @@ router.post("/add", async (req, res) => {
             } else {
                 // Product not found in external API either
                 console.log("Product not found in API. Adding failed for UPC:", upc);
+                req.session.errorMessage = 'Product not found - try a different UPC';
                 return res.redirect('/pantry');
             }
         }
@@ -191,8 +197,8 @@ router.post("/remove", async (req, res) => {
 
     } catch (error) {
         console.error("Error removing item:", error);
-        // Should have an onscreen error here
-        //res.render("login", { title: "Log In", error: "An internal server error occurred." });
+        req.session.errorMessage = 'Failed to remove item - please try again';
+        res.redirect('/pantry');
     }
 });
 

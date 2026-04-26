@@ -68,6 +68,11 @@
 
   <!-- Search Bar with Button -->
   <div class="container" style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
+    <% if (error) { %>
+      <div class="alert alert-danger text-center" role="alert" style="max-width: 400px; margin: 0 auto 20px auto;">
+        <%= error %>
+      </div>
+    <% } %>
     <form action="/pantry/add" method="POST">
       <div class="input-group mb-3" style="max-width: 400px; margin: 0 auto;">
         <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*"
