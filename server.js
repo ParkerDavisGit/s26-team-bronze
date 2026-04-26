@@ -9,6 +9,9 @@ const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
 const session = require('express-session');
 
+// Import recall monitoring service
+const RecallMonitorService = require('./services/recallMonitorService');
+
 const app = express();
 const PORT = 3000;
 
@@ -43,7 +46,18 @@ app.get('/logout', (req, res) => {
     });
 });
 
-//start the server
+// Initialize recall monitoring service
+const recallMonitor = new RecallMonitorService();
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server ready at: http://localhost:${PORT}`);
+  
+  // FDA publishes new enforcement data every Wednesday — daily check catches it within 24 hours
+  recallMonitor.startPeriodicMonitoring(1440);
 });
+
+// Graceful shutdown
+const shutdown = () => { recallMonitor.stopPeriodicMonitoring(); process.exit(0); };
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

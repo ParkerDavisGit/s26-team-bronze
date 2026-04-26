@@ -35,11 +35,11 @@ model Recalls {
   description      String
   recall_date      DateTime
   company          String
-  regions          String
-  amount_sick      Int
-  amount_dead      Int
-  product_keywords String
-  classification   String
+  regions          String  @default("")
+  amount_sick      Int     @default(0)
+  amount_dead      Int     @default(0)
+  product_keywords String  @default("")
+  classification   String  @default("")
 }
 
 model Users { 

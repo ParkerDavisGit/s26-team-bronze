@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require('../db');
-const { getRecallsByUPC } = require('../services/fdaClient');
+const FDARecallService = require('../services/fdaRecallService');
+const NotificationService = require('../services/notificationService');
+const fdaRecallService = new FDARecallService();
+const notificationService = new NotificationService();
 
 
 router.get("/", async (req, res) => {
@@ -156,9 +159,17 @@ router.post("/add", async (req, res) => {
             }
         });
 
-        const recallCount = await checkFDARecalls(upc, existingProduct.product_id);
-        if (recallCount > 0) {
-            req.session.errorMessage = `⚠️ RECALL ALERT: The product you just added (${existingProduct.product_name}) has ${recallCount} active recall${recallCount > 1 ? 's' : ''}. Please check your pantry for details.`;
+        await fdaRecallService.checkRecallsByUPC(upc, existingProduct.product_id);
+
+        const activeRecalls = await prisma.recalls.findMany({ where: { product_id: existingProduct.product_id, is_active: true } });
+        if (activeRecalls.length > 0) {
+            req.session.errorMessage = `⚠️ RECALL ALERT: The product you just added (${existingProduct.product_name}) has ${activeRecalls.length} active recall${activeRecalls.length > 1 ? 's' : ''}. Please check your pantry for details.`;
+
+            const user = await prisma.users.findUnique({ where: { user_id: req.session.userId } });
+            const affectedRecalls = activeRecalls.map(recall => ({ recall, product: existingProduct }));
+            notificationService.sendRecallNotification(user, affectedRecalls).catch(err =>
+                console.error('Failed to send recall notification email:', err)
+            );
         }
 
         console.log("New item added to pantry successfully:", upc);
@@ -198,33 +209,3 @@ router.post("/remove", async (req, res) => {
 });
 
 module.exports = router;
-
-async function checkFDARecalls(upc, productId) {
-    const results = await getRecallsByUPC(upc);
-
-    let count = 0;
-    for (const r of results) {
-        const exists = await prisma.recalls.findFirst({
-            where: { description: r.reason_for_recall, company: r.recalling_firm }
-        });
-        if (exists) continue;
-
-        const year = r.report_date.substring(0, 4);
-        const month = r.report_date.substring(4, 6);
-        const day = r.report_date.substring(6, 8);
-
-        await prisma.recalls.create({
-            data: {
-                product_id: productId,
-                is_active: true,
-                description: r.reason_for_recall || 'No description provided',
-                recall_date: new Date(`${year}-${month}-${day}`),
-                company: r.recalling_firm,
-                regions: r.state || '',
-                classification: r.classification || ''
-            }
-        });
-        count++;
-    }
-    return count;
-}
