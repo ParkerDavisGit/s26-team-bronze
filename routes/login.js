@@ -7,6 +7,11 @@ router.get('/', (req, res) =>{
     res.render("login", { title: "Log In", error: null, success: success });
 });
 
+router.get('/guest', (req, res) => {
+    req.session.isGuest = true;
+    res.redirect('/');
+});
+
 router.post('/', async (req, res) => {
     try {
         const { email, password } = req.body;

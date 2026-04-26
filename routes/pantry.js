@@ -1,56 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require('../db');
+const { getRecallsByUPC } = require('../services/fdaClient');
 
-async function checkFDARecalls(upc, productId) {
-    const res = await fetch(`https://api.fda.gov/food/enforcement.json?search=product_description:%22${upc}%22&limit=10`);
-    const { results = [] } = await res.json();
-
-    let count = 0;
-    for (const r of results) {
-        const exists = await prisma.recalls.findFirst({
-            where: { description: r.reason_for_recall, company: r.recalling_firm }
-        });
-        if (exists) continue;
-
-        const year = r.report_date.substring(0, 4);
-        const month = r.report_date.substring(4, 6);
-        const day = r.report_date.substring(6, 8);
-
-        await prisma.recalls.create({
-            data: {
-                product_id: productId,
-                is_active: true,
-                description: r.reason_for_recall || 'No description provided',
-                recall_date: new Date(`${year}-${month}-${day}`),
-                company: r.recalling_firm,
-                regions: r.state || '',
-                amount_sick: 0,
-                amount_dead: 0,
-                product_keywords: '',
-                classification: r.classification || ''
-            }
-        });
-        count++;
-    }
-    return count;
-}
 
 router.get("/", async (req, res) => {
     try {
-        const isLoggedIn = !!req.session.userId;
-        
-        if (!isLoggedIn) {
-            return res.render("pantry", {
-                title: "Pantry",
-                food_data: [],
-                currentPage: 1,
-                totalPages: 1,
-                isLoggedIn: false,
-                searchQuery: "",
-                error: ""
-            });
-        }
+        if (!req.session.userId) return res.redirect('/login');
 
         const perPage = 10;
         const page = parseInt(req.query.page) || 1;
@@ -242,3 +198,33 @@ router.post("/remove", async (req, res) => {
 });
 
 module.exports = router;
+
+async function checkFDARecalls(upc, productId) {
+    const results = await getRecallsByUPC(upc);
+
+    let count = 0;
+    for (const r of results) {
+        const exists = await prisma.recalls.findFirst({
+            where: { description: r.reason_for_recall, company: r.recalling_firm }
+        });
+        if (exists) continue;
+
+        const year = r.report_date.substring(0, 4);
+        const month = r.report_date.substring(4, 6);
+        const day = r.report_date.substring(6, 8);
+
+        await prisma.recalls.create({
+            data: {
+                product_id: productId,
+                is_active: true,
+                description: r.reason_for_recall || 'No description provided',
+                recall_date: new Date(`${year}-${month}-${day}`),
+                company: r.recalling_firm,
+                regions: r.state || '',
+                classification: r.classification || ''
+            }
+        });
+        count++;
+    }
+    return count;
+}

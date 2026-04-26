@@ -38,27 +38,29 @@
     <!-- Recall Stats -->
     <div class="row mb-4">
       <div class="col-md-6 mb-3">
-        <div class="card text-white bg-info">
-          <div class="card-header">
-            <h5 class="mb-0">🛡️ FDA Food Safety Status</h5>
+        <div class="card text-white bg-info h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">🛡️ FDA Food Safety Status</h6>
+            <select id="recallPeriod" class="form-select form-select-sm w-auto text-dark">
+              <option value="<%= recallsPastMonth %>">Past Month</option>
+              <option value="<%= recallsPast3Months %>">Past 3 Months</option>
+              <option value="<%= recallsPastYear %>">Past Year</option>
+              <option value="<%= recallsAllTime %>">All Time</option>
+            </select>
           </div>
           <div class="card-body">
-            <h3 class="card-title mb-0"><%= (totalFDARecalls || 0).toLocaleString() %></h3>
-            <p class="card-text">Total current FDA food recalls</p>
+            <h3 class="card-title mb-0" id="recallCount"><%= recallsPastMonth.toLocaleString() %></h3>
+            <p class="card-text">FDA recalls in selected period</p>
           </div>
         </div>
       </div>
       <% if (isLoggedIn) { %>
         <div class="col-md-6 mb-3">
-          <div class="card text-white <%= userPantryRecalls > 0 ? 'bg-danger' : 'bg-success' %>">
-            <div class="card-header">
-              <h5 class="mb-0"><%= userPantryRecalls > 0 ? '⚠️ Your Pantry Alert' : '✅ Your Pantry Status' %></h5>
-            </div>
+          <div class="card text-white h-100 <%= userPantryRecalls > 0 ? 'bg-danger' : 'bg-success' %>">
+            <div class="card-header"><h6 class="mb-0"><%= userPantryRecalls > 0 ? '⚠️ Pantry Alert' : '✅ Pantry Status' %></h6></div>
             <div class="card-body">
               <h3 class="card-title mb-0"><%= userPantryRecalls %></h3>
-              <p class="card-text">
-                <%= userPantryRecalls > 0 ? 'Recalled items in your pantry' : 'No recalled items in your pantry' %>
-              </p>
+              <p class="card-text"><%= userPantryRecalls > 0 ? 'Recalled items in your pantry' : 'No recalled items in your pantry' %></p>
               <% if (userPantryRecalls > 0) { %>
                 <a href="/pantry" class="btn btn-light btn-sm">Check Pantry →</a>
               <% } %>
@@ -67,6 +69,11 @@
         </div>
       <% } %>
     </div>
+    <script>
+      document.getElementById('recallPeriod').addEventListener('change', function () {
+        document.getElementById('recallCount').textContent = Number(this.value).toLocaleString();
+      });
+    </script>
   </div>
 
   <!-- All Recalls -->

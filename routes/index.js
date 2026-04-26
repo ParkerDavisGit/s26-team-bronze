@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
-
-const prisma = require('../db'); 
+const prisma = require('../db');
+const { getRecallCountSince, getRecallCountAllTime } = require('../services/fdaClient');
 
 router.get("/", async (req, res) => {
+    if (!req.session.userId && !req.session.isGuest) return res.redirect('/login');
+
     try {
-        const isLoggedIn = req.session.userId ? true : false;
-        
+        const isLoggedIn = !!req.session.userId;
+
         const perPage = 10;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
@@ -14,11 +16,23 @@ router.get("/", async (req, res) => {
         const totalRecalls = await prisma.recalls.count();
         const totalPages = Math.ceil(totalRecalls / perPage);
 
+        const now = new Date();
+        const [recallsPastMonth, recallsPast3Months, recallsPastYear, recallsAllTime] = await Promise.all([
+            getRecallCountSince(new Date(now - 30 * 24 * 60 * 60 * 1000)).catch(() => 0),
+            getRecallCountSince(new Date(now - 90 * 24 * 60 * 60 * 1000)).catch(() => 0),
+            getRecallCountSince(new Date(now - 365 * 24 * 60 * 60 * 1000)).catch(() => 0),
+            getRecallCountAllTime().catch(() => 0),
+        ]);
+
+        const userPantryRecalls = isLoggedIn ? await prisma.inventoryItems.count({
+            where: { user_id: req.session.userId, product: { recalls: { some: { is_active: true } } } }
+        }) : 0;
+
         const results = await prisma.$queryRaw`
-            SELECT 
+            SELECT
                 r.recall_id,
                 r.description,
-                DATE(r.date) AS recall_date, 
+                DATE(r.recall_date) AS recall_date,
                 r.company,
                 r.regions,
                 r.amount_sick,
@@ -26,9 +40,9 @@ router.get("/", async (req, res) => {
                 r.classification,
                 p.product_name
             FROM recalls AS r
-            JOIN products AS p 
+            JOIN products AS p
               ON p.product_id = r.product_id
-            ORDER BY r.date DESC
+            ORDER BY r.recall_date DESC
             LIMIT ${perPage} OFFSET ${offset}
         `;
 
@@ -37,7 +51,12 @@ router.get("/", async (req, res) => {
             recall_data: results,
             currentPage: page,
             totalPages: totalPages,
-            isLoggedIn: isLoggedIn
+            isLoggedIn: isLoggedIn,
+            recallsPastMonth,
+            recallsPast3Months,
+            recallsPastYear,
+            recallsAllTime,
+            userPantryRecalls
         });
 
     } catch (error) {
