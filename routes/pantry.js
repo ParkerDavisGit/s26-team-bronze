@@ -163,7 +163,7 @@ router.post("/add", async (req, res) => {
 
         const activeRecalls = await prisma.recalls.findMany({ where: { product_id: existingProduct.product_id, is_active: true } });
         if (activeRecalls.length > 0) {
-            req.session.errorMessage = `⚠️ RECALL ALERT: The product you just added (${existingProduct.product_name}) has ${activeRecalls.length} active recall${activeRecalls.length > 1 ? 's' : ''}. Please check your pantry for details.`;
+            req.session.errorMessage = `⚠️ RECALL ALERT: The product you just added (${existingProduct.product_name}) has ${activeRecalls.length} active recall${activeRecalls.length > 1 ? 's' : ''}. Please check your email for details.`;
 
             const user = await prisma.users.findUnique({ where: { user_id: req.session.userId } });
             const affectedRecalls = activeRecalls.map(recall => ({ recall, product: existingProduct }));
