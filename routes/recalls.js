@@ -4,7 +4,14 @@ const prisma = require('../db');
 
 router.get('/', async (req, res) => {
   try {
-    const allRecalls = await prisma.recalls.findMany();
+    const allRecalls = await prisma.recalls.findMany({
+  include: {
+    product: true
+  },
+  orderBy: {
+    recall_date: 'desc'
+  }
+});
     
     // Check if the session has a userId
     const isLoggedIn = req.session.userId ? true : false;

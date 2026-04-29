@@ -10,13 +10,40 @@
 
     <%- include('partials/navbar') %>
 
-<div class = "container">
+<div class="container mt-5">
         <h1><%= title %></h1>
-        <h1>Hello, how are you.</h1>
-        <p>I am under the water.<br>
-          Please help me.<br>
-          Here too much raining.</p>
-          <h3>Your recalls appear here!</h3>
+
+        <% if (!recall_data || recall_data.length === 0) { %>
+          <p>No recalls found.</p>
+        <% } else { %>
+          <% recall_data.forEach(recall => { %>
+            <div class="card mb-3">
+              <h3 class="card-header"><%= recall.date || recall.recall_date || '' %></h3>
+
+              <div class="card-body">
+                <h5 class="card-title"><%= recall.company %></h5>
+                <h5 class="card-title"><%= recall.product_name || recall.product?.product_name || 'Unknown product' %></h5>
+                <h6 class="card-subtitle text-muted"><%= recall.classification %></h6>
+
+                <button class="btn btn-outline-secondary mt-3 mb-3"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#recallDetails<%= recall.recall_id %>">
+                  View Details
+                </button>
+
+                <div class="collapse" id="recallDetails<%= recall.recall_id %>">
+                  <div class="card-body border-top">
+                    <p class="card-text">Description: <%= recall.description %></p>
+                    <p class="card-text">Regions: <%= recall.regions %></p>
+                    <p class="card-text">People Affected: <%= recall.amount_sick %></p>
+                    <p class="card-text">Deaths: <%= recall.amount_dead %></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
     </div>
 
     <!-- Login Modal -->
