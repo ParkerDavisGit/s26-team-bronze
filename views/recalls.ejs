@@ -11,15 +11,15 @@
     <%- include('partials/navbar') %>
 
 <div class="container mt-5">
-        <h1><%= title %></h1>
+        <h1 style="color: #EAA221;"><%= title %></h1>
 
         <!-- Date Filter -->
         <div class="mb-4">
           <div class="btn-group me-3 mb-2">
-            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(30)">Past Month</button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(90)">Past 3 Months</button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(365)">Past Year</button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="clearFilter()">All</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(30)">Past Month</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(90)">Past 3 Months</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(365)">Past Year</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="clearFilter()">All</button>
           </div>
           <div class="d-inline-flex align-items-center gap-2 mb-2">
             <input type="date" id="fromDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
