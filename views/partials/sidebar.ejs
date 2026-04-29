@@ -1,0 +1,16 @@
+<div class="offcanvas offcanvas-end bg-black" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarMenuLabel" style="color: #EAA221;">Menu</h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <a href="/recalls" style="display: block; color: #EAA221; padding: 15px; text-decoration: none;">Recalls</a>
+    <a href="/pantry" style="display: block; color: #EAA221; padding: 15px; text-decoration: none;">Pantry</a>
+    <a href="/settings" style="display: block; color: #EAA221; padding: 15px; text-decoration: none;">Settings</a>
+    <% if (isLoggedIn) { %>
+      <a href="/logout" style="display: block; color: #EAA221; padding: 15px; text-decoration: none;">Log Out</a>
+    <% } else { %>
+      <a href="/login" style="display: block; color: #EAA221; padding: 15px; text-decoration: none;">Log In</a>
+    <% } %>
+  </div>
+</div>

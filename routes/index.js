@@ -8,8 +8,17 @@ router.get("/", async (req, res) => {
 
     try {
         const isLoggedIn = !!req.session.userId;
+        let firstName = null;
 
-        const perPage = 10;
+if (isLoggedIn) {
+    const user = await prisma.users.findUnique({
+        where: { user_id: req.session.userId }
+    });
+
+    firstName = user ? user.first_name : null;
+}
+
+        const perPage = 3;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
 
@@ -52,6 +61,7 @@ router.get("/", async (req, res) => {
             currentPage: page,
             totalPages: totalPages,
             isLoggedIn: isLoggedIn,
+            firstName: firstName,
             recallsPastMonth,
             recallsPast3Months,
             recallsPastYear,
