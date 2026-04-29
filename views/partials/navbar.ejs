@@ -1,20 +1,18 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-black">
   <div class="container-fluid">
-    <a class="navbar-brand" style="color: #EAA221" href="/">Spoiler Alert</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-        
+    <a class="navbar-brand d-flex align-items-center gap-2" style="color: #EAA221" href="/">
+      <img src="/assets/favicon.png" alt="logo" width="30" height="30">
+      Spoiler Alert
+    </a>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
       <form class="d-flex me-2" role="search" action="/pantry" method="GET">
         <input class="form-control me-2" style="border-color: #EAA221;" type="search" name="search" placeholder="Search pantry..." aria-label="Search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" />
         <button class="btn" style="border-color: #EAA221; color: #EAA221" type="submit">Search</button>
       </form>
-      <% if (!isLoggedIn) { %>
-        <a class="nav-link" style="color: #EAA221" href="/login">Log In</a>
-      <% } else { %>
-        <a class="nav-link" style="color: #EAA221" href="/logout">Log Out</a>
-      <% } %>
     </div>
+    <button class="btn ms-2" style="color: #EAA221; border-color: #EAA221;" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+      ☰
+    </button>
   </div>
 </nav>
+<%- include('sidebar') %>

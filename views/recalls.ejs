@@ -13,11 +13,31 @@
 <div class="container mt-5">
         <h1><%= title %></h1>
 
+        <!-- Date Filter -->
+        <div class="mb-4">
+          <div class="btn-group me-3 mb-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(30)">Past Month</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(90)">Past 3 Months</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="filterByDays(365)">Past Year</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearFilter()">All</button>
+          </div>
+          <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <input type="date" id="fromDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
+            <span class="text-muted">to</span>
+            <input type="date" id="toDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
+          </div>
+          <% if (isLoggedIn) { %>
+            <button id="pantryToggle" class="btn btn-outline-warning btn-sm ms-2 mb-2" onclick="togglePantry()">Show My Pantry Only</button>
+          <% } %>
+          <span id="filterCount" class="text-muted ms-2 small"></span>
+        </div>
+
+        <div id="recallList">
         <% if (!recall_data || recall_data.length === 0) { %>
           <p>No recalls found.</p>
         <% } else { %>
           <% recall_data.forEach(recall => { %>
-            <div class="card mb-3">
+            <div class="card mb-3" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
               <h3 class="card-header"><%= recall.date || recall.recall_date || '' %></h3>
 
               <div class="card-body">
@@ -44,7 +64,60 @@
             </div>
           <% }) %>
         <% } %>
+        </div><!-- end recallList -->
     </div>
+
+    <script>
+      function getCards() {
+        return document.querySelectorAll('#recallList .card');
+      }
+
+      function filterByDays(days) {
+        const from = new Date();
+        from.setDate(from.getDate() - days);
+        applyFilter(from, new Date());
+      }
+
+      function filterByRange() {
+        const from = document.getElementById('fromDate').value;
+        const to = document.getElementById('toDate').value;
+        if (!from && !to) return clearFilter();
+        applyFilter(from ? new Date(from) : null, to ? new Date(to) : null);
+      }
+
+      function clearFilter() {
+        document.getElementById('fromDate').value = '';
+        document.getElementById('toDate').value = '';
+        applyFilter(null, null);
+      }
+
+      let pantryOnly = false;
+      function togglePantry() {
+        pantryOnly = !pantryOnly;
+        document.getElementById('pantryToggle').textContent = pantryOnly ? 'Show All Recalls' : 'Show My Pantry Only';
+        document.getElementById('pantryToggle').classList.toggle('btn-warning', pantryOnly);
+        document.getElementById('pantryToggle').classList.toggle('btn-outline-warning', !pantryOnly);
+        applyCurrentFilter();
+      }
+
+      function applyCurrentFilter() {
+        const from = document.getElementById('fromDate').value ? new Date(document.getElementById('fromDate').value) : null;
+        const to = document.getElementById('toDate').value ? new Date(document.getElementById('toDate').value) : null;
+        applyFilter(from, to);
+      }
+
+      function applyFilter(from, to) {
+        let visible = 0;
+        document.querySelectorAll('#recallList [data-recall-date]').forEach(el => {
+          const date = new Date(el.dataset.recallDate);
+          const inPantry = el.dataset.inPantry === 'true';
+          const show = (!from || date >= from) && (!to || date <= to) && (!pantryOnly || inPantry);
+          el.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        document.getElementById('filterCount').textContent = `${visible} recall${visible !== 1 ? 's' : ''} shown`;
+      }
+    </script>
 
     <!-- Login Modal -->
     <div class="modal fade"
