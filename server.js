@@ -7,6 +7,7 @@ const recallsRoutes = require('./routes/recalls');
 const settingsRoutes = require('./routes/settings');
 const loginRoutes = require('./routes/login');
 const registerRoutes = require('./routes/register');
+const adminRoutes = require('./routes/admin');
 const session = require('express-session');
 
 // Import recall monitoring service
@@ -35,6 +36,7 @@ app.use('/recalls', recallsRoutes);
 app.use('/settings', settingsRoutes);
 app.use('/login', loginRoutes);
 app.use('/register', registerRoutes);
+app.use('/admin', adminRoutes);
 
 // Route to handle user logout
 app.get('/logout', (req, res) => {

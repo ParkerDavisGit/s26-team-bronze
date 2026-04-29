@@ -10,7 +10,7 @@ class RecallMonitorService {
         this.intervalId = null;
     }
 
-    /**
+    /**mail
      * Run complete recall monitoring cycle
      * @returns {Promise<Object>} Summary of the monitoring cycle
      */
