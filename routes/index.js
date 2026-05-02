@@ -40,7 +40,7 @@ if (isLoggedIn) {
         const results = await prisma.$queryRaw`
             SELECT
                 r.recall_id,
-                r.description,
+                r.reason_for_recall,
                 DATE(r.recall_date) AS recall_date,
                 r.company,
                 r.regions,

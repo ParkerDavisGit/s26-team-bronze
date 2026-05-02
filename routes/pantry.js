@@ -48,10 +48,12 @@ router.get("/", async (req, res) => {
                         upc: true,
                         product_name: true,
                         brand: true,
+                        image_link: true,
+                        allergens: true,
                         recalls: {
                             select: {
                                 recall_id: true,
-                                description: true,
+                                reason_for_recall: true,
                                 recall_date: true,
                                 company: true,
                                 regions: true,
@@ -118,6 +120,10 @@ router.post("/add", async (req, res) => {
                 // Extract product details, provide fallback strings if null
                 const newProductName = apiData.product.product_name || "Unknown Product";
                 const newBrand = apiData.product.brands || "Unknown Brand";
+                const imageLink = apiData.product.image_front_url || apiData.product.image_url || null;
+                const allergens = (apiData.product.allergens_tags || [])
+                    .map(a => a.replace('en:', ''))
+                    .join(', ') || null;
 
                 // Manually calculate the next product_id (Auto-increment workaround)
                 const lastProduct = await prisma.products.findFirst({
@@ -131,7 +137,9 @@ router.post("/add", async (req, res) => {
                         product_id: nextProductId,
                         upc: String(upc),
                         product_name: newProductName,
-                        brand: newBrand
+                        brand: newBrand,
+                        image_link: imageLink,
+                        allergens: allergens
                     }
                 });
                 

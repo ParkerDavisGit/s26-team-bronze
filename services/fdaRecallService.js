@@ -6,10 +6,10 @@ class FDARecallService {
         this.lastChecked = null;
     }
 
-    async fetchRecentRecalls(fromDate = null) {
+    async fetchRecentRecalls(days = 30, fromDate = null) {
         if (!fromDate) {
             fromDate = new Date();
-            fromDate.setDate(fromDate.getDate() - 365);
+            fromDate.setDate(fromDate.getDate() - days);
         }
 
         const from = fromDate.toISOString().slice(0, 10).replace(/-/g, '');
@@ -24,8 +24,10 @@ class FDARecallService {
 
         return fdaResponse.results.map(r => ({
             classification: r.classification,
-            description: r.reason_for_recall || 'No description provided',
-            recall_date: this.parseDate(r.report_date),
+            reason_for_recall: r.reason_for_recall || 'No description provided',
+            recall_date: this.parseDate(r.recall_initiation_date || r.report_date),
+            report_date: this.parseDate(r.report_date),
+            recall_number: r.recall_number || null,
             company: r.recalling_firm,
             regions: r.state ? [r.state] : [],
             productDescription: r.product_description,
@@ -74,7 +76,7 @@ class FDARecallService {
         for (const recallData of recalls) {
             try {
                 const existing = await prisma.recalls.findFirst({
-                    where: { description: recallData.description, company: recallData.company, recall_date: recallData.recall_date }
+                    where: { reason_for_recall: recallData.reason_for_recall, company: recallData.company, recall_date: recallData.recall_date }
                 });
 
                 if (!existing) {
@@ -85,8 +87,10 @@ class FDARecallService {
                         data: {
                             product_id: productId,
                             is_active: recallData.isActive,
-                            description: recallData.description,
+                            reason_for_recall: recallData.reason_for_recall,
                             recall_date: recallData.recall_date,
+                            report_date: recallData.report_date,
+                            recall_number: recallData.recall_number,
                             company: recallData.company,
                             regions: recallData.regions.join(', '),
                             amount_sick: recallData.amountSick,
@@ -96,7 +100,7 @@ class FDARecallService {
                         }
                     });
                     newRecalls.push(newRecall);
-                    console.log(`Added new recall: ${newRecall.description}`);
+                    console.log(`Added new recall: ${newRecall.reason_for_recall}`);
                 }
             } catch (error) {
                 console.error('Error saving recall:', error);
@@ -145,7 +149,7 @@ class FDARecallService {
         let count = 0;
         for (const r of results) {
             const existing = await prisma.recalls.findFirst({
-                where: { description: r.reason_for_recall, company: r.recalling_firm }
+                where: { reason_for_recall: r.reason_for_recall, company: r.recalling_firm }
             });
             if (existing) continue;
 
@@ -153,8 +157,10 @@ class FDARecallService {
                 data: {
                     product_id: productId,
                     is_active: true,
-                    description: r.reason_for_recall || 'No description provided',
-                    recall_date: this.parseDate(r.report_date),
+                    reason_for_recall: r.reason_for_recall || 'No description provided',
+                    recall_date: this.parseDate(r.recall_initiation_date || r.report_date),
+                    report_date: this.parseDate(r.report_date),
+                    recall_number: r.recall_number || null,
                     company: r.recalling_firm,
                     regions: r.state || '',
                     classification: r.classification || ''
@@ -165,9 +171,9 @@ class FDARecallService {
         return count;
     }
 
-    async checkForNewRecalls() {
-        console.log('Starting FDA recall check...');
-        const recalls = await this.fetchRecentRecalls();
+    async checkForNewRecalls(days = 30) {
+        console.log(`Starting FDA recall check (past ${days} days)...`);
+        const recalls = await this.fetchRecentRecalls(days);
         console.log(`Found ${recalls.length} recent recalls from FDA`);
         const newRecalls = await this.saveRecalls(recalls);
         console.log(`Added ${newRecalls.length} new recalls to database`);

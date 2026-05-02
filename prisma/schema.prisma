@@ -23,6 +23,7 @@ model Products {
   product_name String
   brand        String
   image_link   String?
+  allergens    String?
   items        InventoryItems[]
   recalls      Recalls[]
 }
@@ -32,8 +33,10 @@ model Recalls {
   product          Products @relation(fields: [product_id], references: [product_id])
   product_id       Int
   is_active        Boolean
-  description      String
+  reason_for_recall String
   recall_date      DateTime
+  report_date      DateTime?
+  recall_number    String?
   company          String
   regions          String  @default("")
   amount_sick      Int     @default(0)
@@ -50,7 +53,11 @@ model Users {
   password        String
   has_premium     Boolean
   free_scans_left Int?
-  verification_token String? 
+  verification_token String?
   is_verified       Boolean  @default(false)
+  reset_token       String?
+  reset_token_expires DateTime?
+  region_filter     String?
+  notify_pantry_only Boolean @default(false)
   items           InventoryItems[]
 }

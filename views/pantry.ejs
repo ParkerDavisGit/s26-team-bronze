@@ -66,11 +66,18 @@
                     </button>
                   </form>
                 </div>
-                <div class="card-body">
+                <div class="card-body d-flex gap-3">
+                  <% if (item.product.image_link) { %>
+                    <img src="<%= item.product.image_link %>" alt="<%= item.product.product_name %>" style="width: 80px; height: 80px; object-fit: contain;">
+                  <% } %>
+                  <div>
                   <h5 class="card-title" style="color: #EAA221">Brand: <%= item.product.brand %>
                   </h5>
                   <h6 class="card-subtitle" style="color: #EAA221">UPC: <%= item.product.upc %>
                   </h6>
+                  <% if (item.product.allergens) { %>
+                    <p class="mt-2 mb-0" style="color: #EAA221; font-size: 0.85rem;">⚠️ Allergens: <%= item.product.allergens %></p>
+                  <% } %>
 
                   <!-- Display Recall Information -->
                   <% if (item.product.recalls.length !=0) { %>
@@ -90,7 +97,7 @@
                         <p class="card-text" style="color: #EAA221">Classification: <%=
                             item.product.recalls[0].classification %>
                         </p>
-                        <p class="card-text" style="color: #EAA221">Description: <%= item.product.recalls[0].description
+                        <p class="card-text" style="color: #EAA221">Reason for Recall: <%= item.product.recalls[0].reason_for_recall
                             %>
                         </p>
                         <p class="card-text" style="color: #EAA221">Regions: <%= item.product.recalls[0].regions %>
@@ -103,6 +110,7 @@
                       </div>
                     </div>
                     <% } %>
+                  </div><!-- end inner div -->
                 </div>
               </div>
             </div>

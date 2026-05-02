@@ -13,13 +13,33 @@
 <div class="container mt-5">
         <h1 style="color: #EAA221;"><%= title %></h1>
 
+        <!-- Data Source Citation -->
+        <div class="mb-3 p-3 d-flex justify-content-between align-items-center" style="background-color: #1a1a1a; border-radius: 8px; border-left: 4px solid #EAA221;">
+          <div>
+            <% if (regionFilter) { %>
+              <span class="ms-2 badge" style="background-color: #EAA221; color: black;"><%= regionFilter %> only</span>
+              <a href="/settings" class="ms-1 small" style="color: #EAA221;">Change</a>
+            <% } %>
+            <div id="fdaRefreshResult" class="mt-1 small text-white d-none"></div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <select id="fdaDays" class="form-select form-select-sm text-dark" style="width: auto;">
+              <option value="30">Past 30 days</option>
+              <option value="90">Past 90 days</option>
+              <option value="365">Past year</option>
+            </select>
+            <button id="fdaRefreshBtn" class="btn btn-sm" style="border-color: #EAA221; color: #EAA221;" onclick="refreshFromFDA()">↻ Refresh from FDA</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearRecalls()">Clear Recalls</button>
+          </div>
+        </div>
+
         <!-- Date Filter -->
         <div class="mb-4">
-          <div class="btn-group me-3 mb-2">
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(30)">Past Month</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(90)">Past 3 Months</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221;  border-color: #EAA221;" onclick="filterByDays(365)">Past Year</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="clearFilter()">All</button>
+          <div class="btn-group me-3 mb-2" id="datePresets">
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(30, this)">Past Month</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(90, this)">Past 3 Months</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(365, this)">Past Year</button>
+            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="clearFilter(this)">All</button>
           </div>
           <div class="d-inline-flex align-items-center gap-2 mb-2">
             <input type="date" id="fromDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
@@ -34,11 +54,17 @@
 
         <div id="recallList">
         <% if (!recall_data || recall_data.length === 0) { %>
-          <p>No recalls found.</p>
+          <div class="text-center py-5">
+            <h4 style="color: #EAA221;">No recalls in database</h4>
+            <p class="text-light">Click <strong>↻ Refresh from FDA</strong> above to populate with live FDA recall data.</p>
+          </div>
         <% } else { %>
           <% recall_data.forEach(recall => { %>
             <div class="card mb-3" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
-              <h3 class="card-header"><%= recall.date || recall.recall_date || '' %></h3>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Initiated: <%= recall.recall_date ? new Date(recall.recall_date).toLocaleDateString() : recall.date ? new Date(recall.date).toLocaleDateString() : 'Unknown' %></span>
+                <% if (recall.report_date) { %><span class="small text-muted">FDA Report: <%= new Date(recall.report_date).toLocaleDateString() %></span><% } %>
+              </div>
 
               <div class="card-body">
                 <h5 class="card-title"><%= recall.company %></h5>
@@ -54,10 +80,25 @@
 
                 <div class="collapse" id="recallDetails<%= recall.recall_id %>">
                   <div class="card-body border-top">
-                    <p class="card-text">Description: <%= recall.description %></p>
+                    <p class="card-text">Reason for Recall: <%= recall.reason_for_recall %></p>
                     <p class="card-text">Regions: <%= recall.regions %></p>
                     <p class="card-text">People Affected: <%= recall.amount_sick %></p>
                     <p class="card-text">Deaths: <%= recall.amount_dead %></p>
+                    <% if (recall.report_date) {
+                      const rd = new Date(recall.report_date);
+                      const month = rd.toLocaleDateString('en-US', {month:'long'}).toLowerCase();
+                      const day = rd.getDate();
+                      const year = rd.getFullYear();
+                    %>
+                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/enforcement-report-<%= month %>-<%= day %>-<%= year %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
+                    <% } else { %>
+                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts?search_api_fulltext=<%= encodeURIComponent(recall.company) %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
+                    <% } %>
+                    <br>
+                    <% const rawUrl = recall.recall_number
+                      ? `https://api.fda.gov/food/enforcement.json?search=recall_number:%22${recall.recall_number}%22`
+                      : `https://api.fda.gov/food/enforcement.json?search=recalling_firm:%22${encodeURIComponent(recall.company)}%22&limit=5`; %>
+                    <a href="<%= rawUrl %>" target="_blank" class="small mt-1" style="color: #6c757d;">View raw data</a>
                   </div>
                 </div>
               </div>
@@ -72,9 +113,21 @@
         return document.querySelectorAll('#recallList .card');
       }
 
-      function filterByDays(days) {
+      function setActiveBtn(btn) {
+        document.querySelectorAll('#datePresets .btn').forEach(b => {
+          b.classList.remove('btn-secondary');
+          b.classList.add('btn-outline-secondary');
+        });
+        if (btn) {
+          btn.classList.remove('btn-outline-secondary');
+          btn.classList.add('btn-secondary');
+        }
+      }
+
+      function filterByDays(days, btn) {
         const from = new Date();
         from.setDate(from.getDate() - days);
+        setActiveBtn(btn);
         applyFilter(from, new Date());
       }
 
@@ -82,13 +135,56 @@
         const from = document.getElementById('fromDate').value;
         const to = document.getElementById('toDate').value;
         if (!from && !to) return clearFilter();
+        setActiveBtn(null);
         applyFilter(from ? new Date(from) : null, to ? new Date(to) : null);
       }
 
-      function clearFilter() {
+      function clearFilter(btn) {
         document.getElementById('fromDate').value = '';
         document.getElementById('toDate').value = '';
+        setActiveBtn(btn);
         applyFilter(null, null);
+      }
+
+      async function clearRecalls() {
+        if (!confirm('Are you sure you want to clear all recalls? This action is irreversible.')) return;
+        const result = document.getElementById('fdaRefreshResult');
+        try {
+          const res = await fetch('/recalls/clear', { method: 'POST' });
+          const data = await res.json();
+          result.textContent = data.success ? `✓ Cleared ${data.deleted} recalls` : `✗ ${data.error}`;
+          result.classList.remove('d-none');
+          setTimeout(() => location.reload(), 1000);
+        } catch {
+          result.textContent = '✗ Failed to clear';
+          result.classList.remove('d-none');
+        }
+      }
+
+      async function refreshFromFDA() {
+        const btn = document.getElementById('fdaRefreshBtn');
+        const result = document.getElementById('fdaRefreshResult');
+        const days = document.getElementById('fdaDays').value;
+        btn.textContent = '↻ Fetching from FDA...';
+        btn.disabled = true;
+        try {
+          const res = await fetch('/recalls/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ days })
+          });
+          const data = await res.json();
+          result.textContent = data.success
+            ? `✓ Added ${data.added} new recall${data.added !== 1 ? 's' : ''} from FDA (past ${data.days} days)`
+            : `✗ ${data.error}`;
+          result.classList.remove('d-none');
+          if (data.success && data.added > 0) setTimeout(() => location.reload(), 1500);
+          btn.textContent = '↻ Refresh from FDA';
+        } catch {
+          btn.textContent = '✗ Failed';
+        } finally {
+          btn.disabled = false;
+        }
       }
 
       let pantryOnly = false;

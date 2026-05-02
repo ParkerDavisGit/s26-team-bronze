@@ -1,13 +1,37 @@
 var express = require("express");
 var router = express.Router();
+const prisma = require('../db');
 
-router.get('/', (req, res) => {
-  const isLoggedIn = req.session.userId ? true : false;
+router.get('/', async (req, res) => {
+    const isLoggedIn = !!req.session.userId;
+    let user = null;
 
-  res.render('settings', {
-    title: 'Settings',
-    isLoggedIn: isLoggedIn
-  });
+    if (isLoggedIn) {
+        user = await prisma.users.findUnique({ where: { user_id: req.session.userId } });
+    }
+
+    res.render('settings', {
+        title: 'Settings',
+        isLoggedIn,
+        user,
+        success: req.query.success === '1'
+    });
+});
+
+router.post('/', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+
+    const { region_filter, notify_pantry_only } = req.body;
+
+    await prisma.users.update({
+        where: { user_id: req.session.userId },
+        data: {
+            region_filter: region_filter || null,
+            notify_pantry_only: notify_pantry_only === 'on'
+        }
+    });
+
+    res.redirect('/settings?success=1');
 });
 
 module.exports = router;

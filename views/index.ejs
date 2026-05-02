@@ -54,6 +54,7 @@
           <div class="card-body">
             <h3 class="card-title mb-0" id="recallCount"><%= recallsPastMonth.toLocaleString() %></h3>
             <p class="card-text">FDA recalls in selected period</p>
+            <a href="/recalls" class="btn btn-light btn-sm mt-2">View Recalls →</a>
           </div>
         </div>
       </div>
@@ -100,7 +101,7 @@
               </button>
               <div class="collapse" id = "recallDetails<%= recall.recall_id %>">
                 <div class="card-body border-top">
-                  <p class="card-text">Description: <%= recall.description %></p>
+                  <p class="card-text">Reason for Recall: <%= recall.reason_for_recall %></p>
                   <p class="card-text">Regions: <%= recall.regions %></p>
                   <p class="card-text">People Affected: <%= recall.amount_sick %></p>
                   <p class="card-text">Deaths: <%= recall.amount_dead %></p>

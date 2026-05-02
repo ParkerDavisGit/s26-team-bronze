@@ -101,9 +101,9 @@ class NotificationService {
     generateRecallEmailHTML(user, affectedRecalls) {
         const recallItems = affectedRecalls.map(({ recall, product }) => `
             <div style="border: 2px solid #d73527; border-radius: 8px; padding: 15px; margin: 10px 0; background-color: #fef2f2;">
-                <h3 style="color: #d73527; margin-top: 0;">${product.product_name} - ${product.brand}</h3>
+                <h3 style="color: #d73527; margin-top: 0;">${product?.product_name || recall.company} - ${product?.brand || ''}</h3>
                 <p><strong>Recall Classification:</strong> Class ${recall.classification}</p>
-                <p><strong>Reason:</strong> ${recall.description}</p>
+                <p><strong>Reason:</strong> ${recall.reason_for_recall}</p>
                 <p><strong>Company:</strong> ${recall.company}</p>
                 <p><strong>Date:</strong> ${new Date(recall.recall_date).toLocaleDateString()}</p>
                 ${recall.regions ? `<p><strong>Affected Regions:</strong> ${recall.regions}</p>` : ''}
@@ -177,14 +177,28 @@ class NotificationService {
 
             console.log(`Processing notifications for ${newRecalls.length} new recalls...`);
 
-            // Find affected users
             const affectedUsers = await this.findAffectedUsers(newRecalls);
-            console.log(`Found ${affectedUsers.length} users affected by new recalls`);
+
+            // Also notify users who want all recalls (not pantry-only)
+            const allRecallUsers = await prisma.users.findMany({
+                where: { notify_pantry_only: false },
+                include: { items: { include: { product: true } } }
+            });
+
+            for (const user of allRecallUsers) {
+                if (!affectedUsers.find(u => u.user.user_id === user.user_id)) {
+                    affectedUsers.push({
+                        user,
+                        affectedRecalls: newRecalls.map(r => ({ recall: r, product: r.product }))
+                    });
+                }
+            }
+
+            console.log(`Found ${affectedUsers.length} users to notify`);
 
             let sent = 0;
             let failed = 0;
 
-            // Send notifications
             for (const { user, affectedRecalls } of affectedUsers) {
                 try {
                     await this.sendRecallNotification(user, affectedRecalls);
