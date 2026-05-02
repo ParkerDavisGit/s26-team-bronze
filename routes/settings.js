@@ -34,4 +34,15 @@ router.post('/', async (req, res) => {
     res.redirect('/settings?success=1');
 });
 
+router.post('/delete', async (req, res) => {
+    if (!req.session.userId) return res.redirect('/login');
+
+    const userId = req.session.userId;
+
+    await prisma.inventoryItems.deleteMany({ where: { user_id: userId } });
+    await prisma.users.delete({ where: { user_id: userId } });
+
+    req.session.destroy(() => res.redirect('/login'));
+});
+
 module.exports = router;
