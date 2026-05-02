@@ -5,6 +5,46 @@
     <%- include('partials/head') %>
 
     <style>
+      .notify-switch {
+        position: relative;
+        display: inline-block;
+        width: 56px;
+        height: 28px;
+        cursor: pointer;
+      }
+      .notify-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .notify-slider {
+        position: absolute;
+        inset: 0;
+        background-color: #EAA221;
+        border-radius: 36px;
+        transition: background-color 0.3s ease;
+      }
+      .notify-slider:before {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        left: 4px;
+        top: 4px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+      }
+      .notify-switch input:checked + .notify-slider {
+        background-color: #4CAF50;
+      }
+      .notify-switch input:checked + .notify-slider:before {
+        transform: translateX(28px);
+      }
+      .notify-switch input:focus + .notify-slider {
+        box-shadow: 0 0 0 3px rgba(234, 162, 33, 0.4);
+      }
+
       html, body {
         min-height: 100%;
       }
@@ -13,68 +53,6 @@
         background:
           linear-gradient(#00000080, #000000BF),
           url(/assets/img/bg-img-1.jpg) center/cover no-repeat fixed;
-      }
-      /* The switch - the box around the slider */
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-      }
-
-      /* Hide default HTML checkbox */
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      /* The slider */
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-      }
-
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: .4s;
-        transition: .4s;
-      }
-
-      input:checked + .slider {
-        background-color: #2196F3;
-      }
-
-      input:focus + .slider {
-        box-shadow: 0 0 1px #2196F3;
-      }
-
-      input:checked + .slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-      }
-
-      /* Rounded sliders */
-      .slider.round {
-        border-radius: 34px;
-      }
-
-      .slider.round:before {
-        border-radius: 50%;
       }
     </style>
   
@@ -110,13 +88,21 @@
           <!-- Notification Preference -->
           <div class="mb-4">
             <h5 class="mb-3">Email Notifications</h5>
-            <div class="form-check form-switch fs-5">
-              <input class="form-check-input" type="checkbox" id="notifyPantryOnly" name="notify_pantry_only" <%= user && user.notify_pantry_only ? 'checked' : '' %>>
-              <label class="form-check-label ms-2" for="notifyPantryOnly">
-                Only notify me about recalls affecting my pantry
+            <div class="d-flex align-items-center gap-3">
+              <label class="notify-switch">
+                <input type="checkbox" id="notifyToggle" <%= !user || !user.notify_pantry_only ? 'checked' : '' %>>
+                <span class="notify-slider"></span>
               </label>
+              <input type="hidden" name="notify_pantry_only" id="notifyPantryOnlyVal" value="<%= user && user.notify_pantry_only ? 'on' : '' %>">
+              <div style="margin-left: 1rem;">
+                <div id="notifyLabel" style="font-size: 1rem; font-weight: bold; color: <%= !user || !user.notify_pantry_only ? '#4CAF50' : '#EAA221' %>;">
+                  <%= !user || !user.notify_pantry_only ? 'All FDA Recalls' : 'My Pantry Only' %>
+                </div>
+                <div id="notifyDesc" class="small text-muted mt-1">
+                  <%= !user || !user.notify_pantry_only ? 'You will be notified about all new FDA food recalls.' : 'You will only be notified about recalls matching your pantry items.' %>
+                </div>
+              </div>
             </div>
-            <p class="text-muted small mt-1">When off, you'll receive emails for all new FDA recalls. When on, only recalls matching products in your pantry will trigger an email.</p>
           </div>
 
           <!-- Region Filter -->
@@ -145,5 +131,21 @@
     </div>
   </div>
 </div>
+  <script>
+    document.getElementById('notifyToggle').addEventListener('change', function() {
+      const label = document.getElementById('notifyLabel');
+      const desc = document.getElementById('notifyDesc');
+      if (this.checked) {
+        label.textContent = 'All FDA Recalls';
+        label.style.color = '#4CAF50';
+        desc.textContent = 'You will be notified about all new FDA food recalls.';
+      } else {
+        label.textContent = 'My Pantry Only';
+        label.style.color = '#EAA221';
+        desc.textContent = 'You will only be notified about recalls matching your pantry items.';
+      }
+      document.getElementById('notifyPantryOnlyVal').value = this.checked ? '' : 'on';
+    });
+  </script>
   </body>
 </html>
