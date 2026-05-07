@@ -70,70 +70,70 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
+<% if (isLoggedIn) { %>
+  <div class="container mb-5">
+    <div class="card shadow-lg mx-auto" style="max-width: 700px;">
+      <div class="card-body p-5">
 
-<div class="container mb-5">
-  <div class="card shadow-lg">
-    <div class="card-body ps-5 py-5" style="min-height: 450px;">
+        <% if (success) { %>
+          <div class="alert alert-success">Settings saved successfully.</div>
+        <% } %>
 
-      <% if (success) { %>
-        <div class="alert alert-success">Settings saved successfully.</div>
-      <% } %>
+          <form action="/settings" method="POST">
 
-      <% if (!isLoggedIn) { %>
-        <p class="text-muted">Please <a href="/login">log in</a> to manage your settings.</p>
-      <% } else { %>
-
-        <form action="/settings" method="POST">
-
-          <!-- Notification Preference -->
-          <div class="mb-4">
-            <h5 class="mb-3">Email Notifications</h5>
-            <div class="d-flex align-items-center gap-3">
-              <label class="notify-switch">
-                <input type="checkbox" id="notifyToggle" <%= !user || !user.notify_pantry_only ? 'checked' : '' %>>
-                <span class="notify-slider"></span>
-              </label>
-              <input type="hidden" name="notify_pantry_only" id="notifyPantryOnlyVal" value="<%= user && user.notify_pantry_only ? 'on' : '' %>">
-              <div style="margin-left: 1rem;">
-                <div id="notifyLabel" style="font-size: 1rem; font-weight: bold; color: <%= !user || !user.notify_pantry_only ? '#4CAF50' : '#EAA221' %>;">
-                  <%= !user || !user.notify_pantry_only ? 'All FDA Recalls' : 'My Pantry Only' %>
-                </div>
-                <div id="notifyDesc" class="small text-muted mt-1">
-                  <%= !user || !user.notify_pantry_only ? 'You will be notified about all new FDA food recalls.' : 'You will only be notified about recalls matching your pantry items.' %>
+            <!-- Notification Preference -->
+            <div class="mb-4">
+              <h5 class="mb-3">Email Notifications</h5>
+              <div class="d-flex align-items-center gap-3">
+                <label class="notify-switch">
+                  <input type="checkbox" id="notifyToggle" <%= !user || !user.notify_pantry_only ? 'checked' : '' %>>
+                  <span class="notify-slider"></span>
+                </label>
+                <input type="hidden" name="notify_pantry_only" id="notifyPantryOnlyVal" value="<%= user && user.notify_pantry_only ? 'on' : '' %>">
+                <div style="margin-left: 1rem;">
+                  <div id="notifyLabel" style="font-size: 1rem; font-weight: bold; color: <%= !user || !user.notify_pantry_only ? '#4CAF50' : '#EAA221' %>;">
+                    <%= !user || !user.notify_pantry_only ? 'All FDA Recalls' : 'My Pantry Only' %>
+                  </div>
+                  <div id="notifyDesc" class="small text-muted mt-1">
+                    <%= !user || !user.notify_pantry_only ? 'You will be notified about all new FDA food recalls.' : 'You will only be notified about recalls matching your pantry items.' %>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+            
+            <hr class="my-4">
+            <!-- Region Filter -->
+            <div class="mb-4">
+              <h5 class="mb-3">Recall Region Filter</h5>
+              <p class="text-muted small">Only show recalls affecting your selected state. Leave blank to see all regions.</p>
+              <select name="region_filter" class="form-select" style="max-width: 300px;">
+                <option value="">All Regions</option>
+                <% const states = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']; %>
+                <% states.forEach(state => { %>
+                  <option value="<%= state %>" <%= user && user.region_filter === state ? 'selected' : '' %>><%= state %></option>
+                <% }) %>
+              </select>
+            </div>
 
-          <!-- Region Filter -->
-          <div class="mb-4">
-            <h5 class="mb-3">Recall Region Filter</h5>
-            <p class="text-muted small">Only show recalls affecting your selected state. Leave blank to see all regions.</p>
-            <select name="region_filter" class="form-select" style="max-width: 300px;">
-              <option value="">All Regions</option>
-              <% const states = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY']; %>
-              <% states.forEach(state => { %>
-                <option value="<%= state %>" <%= user && user.region_filter === state ? 'selected' : '' %>><%= state %></option>
-              <% }) %>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="background-color: #EAA221; border: none; color: black;">Save Settings</button>
-        </form>
-
-        <!-- Bottom button -->
-        <div class="mt-5">
-          <form action="/settings/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This is permanent and cannot be undone.')">
-            <button type="submit" class="btn btn-danger">Delete Account</button>
+            <div class = "d-flex justify-content-end mt-4">
+              <button type="submit" class="btn btn-primary" style="background-color: #EAA221; outline: black; color: black;">Save Settings</button>
+            </div>
+            
           </form>
-        </div>
 
-      <% } %>
-
+          <!-- Bottom button -->
+          <div class="mt-5 pt-4 border-top">
+            <p class="text-muted small mb-2">
+              Permanently remove your account and saved preferences.
+            </p>
+            <form action="/settings/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This is permanent and cannot be undone.')">
+              <button type="submit" class="btn btn-danger">Delete Account</button>
+            </form>
+          </div>
+      </div>
     </div>
   </div>
-</div>
-
+<% } %>
     <!-- Login Modal -->
     <div class="modal fade"
           id="loginRequiredModal"
