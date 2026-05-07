@@ -61,11 +61,11 @@ router.get("/", async (req, res) => {
                         product_name: true,
                         brand: true,
                         image_link: true,
-                        //allergens: true,
+                        allergens: true,
                         recalls: {
                             select: {
                                 recall_id: true,
-                                //reason_for_recall: true,
+                                reason_for_recall: true,
                                 recall_date: true,
                                 company: true,
                                 regions: true,
