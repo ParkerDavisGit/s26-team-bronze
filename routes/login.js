@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
         if (!user || user.password !== password) {
             return res.render("login", {
                 title: "Log In",
-                error: " Incorrect email or password.  Please try again."
+                error: " Incorrect email or password."
             })
         };
 
