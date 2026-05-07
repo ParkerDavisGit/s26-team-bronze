@@ -22,13 +22,12 @@ router.post('/', async (req, res) => {
             where: { email: email }
         });
 
-        if (!user) {
-            return res.render("login", { title: "Log In", error: "User not found. Please try again." });
-        }
-
-        if (user.password !== password) {
-            return res.render("login", { title: "Log In", error: "Incorrect password." });
-        }
+        if (!user || user.password !== password) {
+            return res.render("login", {
+                title: "Log In",
+                error: " Incorrect email or password.  Please try again."
+            })
+        };
 
         // If the user's email is not verified, block the login
         if (!user.is_verified) {
