@@ -133,6 +133,40 @@
     </div>
   </div>
 </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade"
+          id="loginRequiredModal"
+          tabindex="-1"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color:black; --bs-modal-border-color:#EAA221;">
+
+          <div class="modal-header" >
+            <h3 class="modal-title" style="color:#EAA221;">Login Required</h3>
+          </div>
+
+          <div class="modal-body">
+            <p style="color:#EAA221;">You must be logged in to view this page.</p>
+          </div>
+
+          <div class="modal-footer">
+            <a href="/login" class="btn btn-outline-light" style="color:#EAA221; --bs-btn-border-color: #EAA221;">Log In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if (!isLoggedIn) { %>
+      <script>
+        window.onload = function () {
+          const modal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+          modal.show();
+        };
+      </script>
+    <% } %>
+
   <script>
     document.getElementById('notifyToggle').addEventListener('change', function() {
       const label = document.getElementById('notifyLabel');
