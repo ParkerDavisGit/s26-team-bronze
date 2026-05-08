@@ -9,13 +9,25 @@ const notificationService = new NotificationService();
 
 router.get("/", async (req, res) => {
     try {
-        if (!req.session.userId) return res.redirect('/login');
-
         const perPage = 10;
         const page = parseInt(req.query.page) || 1;
         const offset = (page - 1) * perPage;
         const searchQuery = req.query.search || "";
 
+        const isLoggedIn = !!req.session.userId;
+
+        if (!isLoggedIn) {
+            return res.render("pantry", {
+                title: "Pantry",
+                food_data: [],
+                currentPage: 1,
+                totalPages: 0,
+                isLoggedIn: false,
+                searchQuery: "",
+                error: ""
+            });
+        }
+        
         // Build where clause for searching
         let whereClause = {
             user_id: req.session.userId
