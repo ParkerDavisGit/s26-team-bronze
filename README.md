@@ -13,7 +13,7 @@ A pantry management application with food recall monitoring.
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd s26-team-bronze
+   cd s26-team-bronze 
    ```
 
 2. **Install dependencies**
