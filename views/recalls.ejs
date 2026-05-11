@@ -11,10 +11,13 @@
     <%- include('partials/navbar') %>
 
 <div class="container mt-5">
-        <h1 style="color: #EAA221;"><%= title %></h1>
+  <div class="container" style="margin-top: 50px; margin-bottom: 50px; padding-bottom: 25px; border-bottom: solid 2px;">
+    <h1 style="color: #EAA221; text-align: center;"><%= title %></h1>
+  </div>
+        
 
         <!-- Date Filter -->
-        <div class="mb-4">
+        <div class="mb-4" style = "display: flex; justify-content: center;">
           <div class="btn-group me-3 mb-2" id="datePresets">
             <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(30, this)">Past Month</button>
             <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(90, this)">Past 3 Months</button>
@@ -32,60 +35,60 @@
           <span id="filterCount" class="text-muted ms-2 small"></span>
         </div>
 
-        <div id="recallList">
-        <% if (!recall_data || recall_data.length === 0) { %>
-          <div class="text-center py-5">
-            <h4 style="color: #EAA221;">No recalls in database</h4>
-            <p class="text-light">Click <strong>↻ Refresh from FDA</strong> above to populate with live FDA recall data.</p>
-          </div>
-        <% } else { %>
-          <% recall_data.forEach(recall => { %>
-            <div class="card mb-3" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Initiated: <%= recall.recall_date ? new Date(recall.recall_date).toLocaleDateString() : recall.date ? new Date(recall.date).toLocaleDateString() : 'Unknown' %></span>
-                <% if (recall.report_date) { %><span class="small text-muted">FDA Report: <%= new Date(recall.report_date).toLocaleDateString() %></span><% } %>
-              </div>
+        <div class="container" style="display: flex; justify-content: center;">
+          <div id="recallList">
+          <% if (!recall_data || recall_data.length === 0) { %>
+            <div class="text-center py-5">
+              <h4 style="color: #EAA221;">No recalls in database</h4>
+            </div>
+          <% } else { %>
+            <% recall_data.forEach(recall => { %>
+              <div class="card mb-3" style="width: 100vh;" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <% if (recall.report_date) { %><span class="small text-muted">FDA Report: <%= new Date(recall.report_date).toLocaleDateString() %></span><% } %>
+                </div>
 
-              <div class="card-body">
-                <h5 class="card-title"><%= recall.company %></h5>
-                <h5 class="card-title"><%= recall.product_name || recall.product?.product_name || 'Unknown product' %></h5>
-                <h6 class="card-subtitle text-muted"><%= recall.classification %></h6>
+                <div class="card-body">
+                  <h5 class="card-title"><%= recall.company %></h5>
+                  <h5 class="card-title"><%= recall.product_name || recall.product?.product_name || 'Unknown product' %></h5>
+                  <h6 class="card-subtitle text-muted"><%= recall.classification %></h6>
 
-                <button class="btn btn-outline-secondary mt-3 mb-3"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#recallDetails<%= recall.recall_id %>">
-                  View Details
-                </button>
+                  <button class="btn btn-outline-secondary mt-3 mb-3"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#recallDetails<%= recall.recall_id %>">
+                    View Details
+                  </button>
 
-                <div class="collapse" id="recallDetails<%= recall.recall_id %>">
-                  <div class="card-body border-top">
-                    <p class="card-text">Reason for Recall: <%= recall.reason_for_recall %></p>
-                    <p class="card-text">Regions: <%= recall.regions %></p>
-                    <p class="card-text">People Affected: <%= recall.amount_sick %></p>
-                    <p class="card-text">Deaths: <%= recall.amount_dead %></p>
-                    <% if (recall.report_date) {
-                      const rd = new Date(recall.report_date);
-                      const month = rd.toLocaleDateString('en-US', {month:'long'}).toLowerCase();
-                      const day = rd.getDate();
-                      const year = rd.getFullYear();
-                    %>
-                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/enforcement-report-<%= month %>-<%= day %>-<%= year %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
-                    <% } else { %>
-                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts?search_api_fulltext=<%= encodeURIComponent(recall.company) %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
-                    <% } %>
-                    <br>
-                    <% const rawUrl = recall.recall_number
-                      ? `https://api.fda.gov/food/enforcement.json?search=recall_number:%22${recall.recall_number}%22`
-                      : `https://api.fda.gov/food/enforcement.json?search=recalling_firm:%22${encodeURIComponent(recall.company)}%22&limit=5`; %>
-                    <a href="<%= rawUrl %>" target="_blank" class="small mt-1" style="color: #6c757d;">View raw data</a>
+                  <div class="collapse" id="recallDetails<%= recall.recall_id %>">
+                    <div class="card-body border-top">
+                      <p class="card-text">Reason for Recall: <%= recall.reason_for_recall %></p>
+                      <p class="card-text">Regions: <%= recall.regions %></p>
+                      <p class="card-text">People Affected: <%= recall.amount_sick %></p>
+                      <p class="card-text">Deaths: <%= recall.amount_dead %></p>
+                      <% if (recall.report_date) {
+                        const rd = new Date(recall.report_date);
+                        const month = rd.toLocaleDateString('en-US', {month:'long'}).toLowerCase();
+                        const day = rd.getDate();
+                        const year = rd.getFullYear();
+                      %>
+                        <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/enforcement-report-<%= month %>-<%= day %>-<%= year %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
+                      <% } else { %>
+                        <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts?search_api_fulltext=<%= encodeURIComponent(recall.company) %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
+                      <% } %>
+                      <br>
+                      <% const rawUrl = recall.recall_number
+                        ? `https://api.fda.gov/food/enforcement.json?search=recall_number:%22${recall.recall_number}%22`
+                        : `https://api.fda.gov/food/enforcement.json?search=recalling_firm:%22${encodeURIComponent(recall.company)}%22&limit=5`; %>
+                      <a href="<%= rawUrl %>" target="_blank" class="small mt-1" style="color: #6c757d;">View raw data</a>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          <% }) %>
-        <% } %>
+            <% }) %>
+          <% } %>
         </div><!-- end recallList -->
+      </div>
     </div>
 
     <script>
