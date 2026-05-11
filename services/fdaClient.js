@@ -5,11 +5,6 @@ async function fdaFetch(path) {
     return res.json();
 }
 
-async function getRecallsByUPC(upc) {
-    const data = await fdaFetch(`/food/enforcement.json?search=product_description:%22${upc}%22&limit=10`);
-    return data.results || [];
-}
-
 async function getRecallCountSince(date) {
     const from = date.toISOString().slice(0, 10).replace(/-/g, '');
     const to = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -22,4 +17,4 @@ async function getRecallCountAllTime() {
     return data.meta?.results?.total || 0;
 }
 
-module.exports = { getRecallsByUPC, getRecallCountSince, getRecallCountAllTime };
+module.exports = { getRecallCountSince, getRecallCountAllTime };

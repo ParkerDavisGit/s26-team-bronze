@@ -178,8 +178,9 @@ router.post("/add", async (req, res) => {
                 price: 0.0
             }
         });
-
-        await fdaRecallService.checkRecallsByUPC(upc, existingProduct.product_id);
+        
+        // This is completely pointless and needlessly spams the FDA API.
+        //await fdaRecallService.checkRecallsByUPC(upc, existingProduct.product_id);
 
         const activeRecalls = await prisma.recalls.findMany({ where: { product_id: existingProduct.product_id, is_active: true } });
         if (activeRecalls.length > 0) {
