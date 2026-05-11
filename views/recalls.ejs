@@ -19,10 +19,10 @@
         <!-- Date Filter -->
         <div class="mb-4" style = "display: flex; justify-content: center;">
           <div class="btn-group me-3 mb-2" id="datePresets">
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(30, this)">Past Month</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(90, this)">Past 3 Months</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="filterByDays(365, this)">Past Year</button>
-            <button class="btn btn-outline-secondary btn-sm" style="color: #EAA221; border-color: #EAA221;" onclick="clearFilter(this)">All</button>
+            <button class="btn btn-secondary btn-sm" style="color: #EAA221; border-color: #EAA221; background-color: black;" onclick="filterByDays(30, this)">Past Month</button>
+            <button class="btn btn-secondary btn-sm" style="color: #EAA221; border-color: #EAA221; background-color: black;" onclick="filterByDays(90, this)">Past 3 Months</button>
+            <button class="btn btn-secondary btn-sm" style="color: #EAA221; border-color: #EAA221; background-color: black;" onclick="filterByDays(365, this)">Past Year</button>
+            <button class="btn btn-secondary btn-sm" style="color: #EAA221; border-color: #EAA221; background-color: black;" onclick="clearFilter(this)">All</button>
           </div>
           <div class="d-inline-flex align-items-center gap-2 mb-2">
             <input type="date" id="fromDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
@@ -30,7 +30,7 @@
             <input type="date" id="toDate" class="form-control form-control-sm" style="width: auto;" onchange="filterByRange()">
           </div>
           <% if (isLoggedIn) { %>
-            <button id="pantryToggle" class="btn btn-outline-warning btn-sm ms-2 mb-2" onclick="togglePantry()">Show My Pantry Only</button>
+            <button id="pantryToggle" class="btn btn-secondary btn-sm ms-2 mb-2" style="color: #EAA221; border-color: #EAA221; background-color: black;" onclick="togglePantry()">Show My Pantry Only</button>
           <% } %>
           <span id="filterCount" class="text-muted ms-2 small"></span>
         </div>
