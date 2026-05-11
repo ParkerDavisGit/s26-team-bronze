@@ -1,5 +1,4 @@
 const prisma = require('../db');
-const { getRecallsByUPC } = require('./fdaClient');
 
 class FDARecallService {
     constructor() {
@@ -142,33 +141,6 @@ class FDARecallService {
             data: { upc: '0', product_name: recallData.productDescription.substring(0, 100), brand: recallData.company, image_link: null }
         });
         return product.product_id;
-    }
-
-    async checkRecallsByUPC(upc, productId) {
-        const results = await getRecallsByUPC(upc);
-        let count = 0;
-        for (const r of results) {
-            const existing = await prisma.recalls.findFirst({
-                where: { reason_for_recall: r.reason_for_recall, company: r.recalling_firm }
-            });
-            if (existing) continue;
-
-            await prisma.recalls.create({
-                data: {
-                    product_id: productId,
-                    is_active: true,
-                    reason_for_recall: r.reason_for_recall || 'No description provided',
-                    recall_date: this.parseDate(r.recall_initiation_date || r.report_date),
-                    report_date: this.parseDate(r.report_date),
-                    recall_number: r.recall_number || null,
-                    company: r.recalling_firm,
-                    regions: r.state || '',
-                    classification: r.classification || ''
-                }
-            });
-            count++;
-        }
-        return count;
     }
 
     async checkForNewRecalls(days = 30) {
