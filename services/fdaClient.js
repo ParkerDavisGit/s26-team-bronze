@@ -8,12 +8,12 @@ async function fdaFetch(path) {
 async function getRecallCountSince(date) {
     const from = date.toISOString().slice(0, 10).replace(/-/g, '');
     const to = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const data = await fdaFetch(`/food/enforcement.json?search=report_date:[${from}+TO+${to}]&limit=1`);
+    const data = await fdaFetch(`/food/enforcement.json?search=report_date:[${from}+TO+${to}]&limit=1&sort=report_date:desc`);
     return data.meta?.results?.total || 0;
 }
 
 async function getRecallCountAllTime() {
-    const data = await fdaFetch('/food/enforcement.json?limit=1');
+    const data = await fdaFetch('/food/enforcement.json?limit=1&sort=report_date:desc');
     return data.meta?.results?.total || 0;
 }
 

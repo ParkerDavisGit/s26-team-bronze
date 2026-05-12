@@ -13,7 +13,7 @@ class FDARecallService {
 
         const from = fromDate.toISOString().slice(0, 10).replace(/-/g, '');
         const to = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-        const res = await fetch(`https://api.fda.gov/food/enforcement.json?search=report_date:[${from}+TO+${to}]&limit=100`);
+        const res = await fetch(`https://api.fda.gov/food/enforcement.json?search=report_date:[${from}+TO+${to}]&limit=100&sort=report_date:desc`);
         const data = await res.json();
         return this.parseRecallData(data);
     }
