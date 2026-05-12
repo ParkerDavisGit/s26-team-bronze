@@ -66,16 +66,7 @@
                       <p class="card-text">Regions: <%= recall.regions %></p>
                       <p class="card-text">People Affected: <%= recall.amount_sick %></p>
                       <p class="card-text">Deaths: <%= recall.amount_dead %></p>
-                      <% if (recall.report_date) {
-                        const rd = new Date(recall.report_date);
-                        const month = rd.toLocaleDateString('en-US', {month:'long'}).toLowerCase();
-                        const day = rd.getDate();
-                        const year = rd.getFullYear();
-                      %>
-                        <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/enforcement-report-<%= month %>-<%= day %>-<%= year %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
-                      <% } else { %>
-                        <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts?search_api_fulltext=<%= encodeURIComponent(recall.company) %>" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
-                      <% } %>
+                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
                       <br>
                       <% const rawUrl = recall.recall_number
                         ? `https://api.fda.gov/food/enforcement.json?search=recall_number:%22${recall.recall_number}%22`
