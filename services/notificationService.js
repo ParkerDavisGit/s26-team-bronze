@@ -156,7 +156,7 @@ class NotificationService {
                 
                 <p style="color: #9ca3af; font-size: 12px; text-align: center;">
                     Spoiler Alert Team<br>
-                    Keeping your food safe, one notification at a time.
+                    No Surprises at the Table.
                 </p>
             </div>
         </div>

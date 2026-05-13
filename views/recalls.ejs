@@ -45,7 +45,7 @@
             <% recall_data.forEach(recall => { %>
               <div class="card mb-3" style="width: 100vh;" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <% if (recall.report_date) { %><span class="small text-muted">FDA Report: <%= new Date(recall.report_date).toLocaleDateString() %></span><% } %>
+                  <% if (recall.recall_date) { %><span class="small text-muted">Recall Date: <%= new Date(recall.recall_date).toLocaleDateString() %></span><% } %>
                 </div>
 
                 <div class="card-body">
@@ -66,7 +66,7 @@
                       <p class="card-text">Regions: <%= recall.regions %></p>
                       <p class="card-text">People Affected: <%= recall.amount_sick %></p>
                       <p class="card-text">Deaths: <%= recall.amount_dead %></p>
-                      <a href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
+                      <a href="https://www.accessdata.fda.gov/scripts/ires/index.cfm" target="_blank" class="btn btn-outline-warning btn-sm mt-2">View on FDA.gov →</a>
                       <br>
                       <% const rawUrl = recall.recall_number
                         ? `https://api.fda.gov/food/enforcement.json?search=recall_number:%22${recall.recall_number}%22`
