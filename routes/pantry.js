@@ -121,7 +121,7 @@ router.post("/add", async (req, res) => {
 
         // 2. If not, fetch it from the API
         if (!existingProduct) {
-            console.log("Product not in local DB. Fetching from external API...", upc);
+            console.log("Product not in local DB. Fetching from OpenFoodFacts API...", upc);
             
             const apiUrl = `https://world.openfoodfacts.net/api/v2/product/${upc}.json`;
             const response = await fetch(apiUrl);

@@ -41,19 +41,25 @@ class FDARecallService {
 
     extractUPCs(productDescription) {
         if (!productDescription) return [];
-
         const patterns = [
-            /UPC\s*:?\s*(\d{5}\s*\d{5}\s*\d+)/gi,
-            /UPC\s*:?\s*(\d{12,14})/gi,
-            /UPC\s*#?\s*(\d{5}\s*\d{5}\s*\d+)/gi,
-            /\b(\d{12,14})\b/g
+            /(\d(\s*|-)\d{4,5}(\s*|-)\d{4,5}(\s*|-)\d+)/gi,
+            /(\d{5}\s*\d{5}\s*\d+)/gi,
+            /(\d\s*\d{5}\s*\d{5}\s*\d+)/gi,
+            /(\d{11,14})/gi,
+            /(\d{11,14})/gi,
+            /(\d{5}\s*\d{5}\s*\d+)/gi,
+            /(\d-\d{5}-\d{5}-\d+)/gi,
+            /(\d{5}-\d{5}-\d+)/gi,
+            /(\d{5}-\d{5}-\d+)/gi,
+            /(\d-\d{5}-\d{5}-\d+)/gi,
+            /\b(\d{11,14})\b/g
         ];
 
         const upcs = [];
         for (const pattern of patterns) {
             for (const match of productDescription.matchAll(pattern)) {
-                const upc = match[1].replace(/\s/g, '');
-                if (upc.length >= 12 && upc.length <= 14) upcs.push(upc);
+                const upc = match[0].replaceAll(/\s/g, '').replaceAll('-', '');
+                if (upc.length >= 11 && upc.length <= 14) upcs.push(upc);
             }
         }
         return [...new Set(upcs)];
@@ -101,6 +107,9 @@ class FDARecallService {
                     newRecalls.push(newRecall);
                     console.log(`Added new recall: ${newRecall.reason_for_recall}`);
                 }
+                else {
+
+                }
             } catch (error) {
                 console.error('Error saving recall:', error);
             }
@@ -119,28 +128,82 @@ class FDARecallService {
             }
         }
 
-        if (recallData.recallingFirm) {
-            const brandKeywords = recallData.recallingFirm.toLowerCase().split(/[\s,&]+/);
-            const matches = await prisma.products.findMany({
-                where: { OR: brandKeywords.filter(kw => kw.length > 2).map(kw => ({ brand: { contains: kw } })) }
-            });
-            if (matches.length > 0) return matches[0].product_id;
-        }
+        // if (recallData.recallingFirm) {
+        //     const brandKeywords = recallData.recallingFirm.toLowerCase().split(/[\s,&]+/);
+        //     const matches = await prisma.products.findMany({
+        //         where: { OR: brandKeywords.filter(kw => kw.length > 2).map(kw => ({ brand: { contains: kw } })) }
+        //     });
+        //     if (matches.length > 0) return matches[0].product_id;
+        // }
 
-        const keywords = recallData.productKeywords.split(' ').filter(k => k.length > 3);
-        if (keywords.length === 0) return null;
+        // const keywords = recallData.productKeywords.split(' ').filter(k => k.length > 3);
+        // if (keywords.length === 0) return null;
 
-        const matches = await prisma.products.findMany({
-            where: { OR: keywords.map(kw => ({ OR: [{ product_name: { contains: kw } }, { brand: { contains: kw } }] })) }
-        });
-        return matches.length > 0 ? matches[0].product_id : null;
+        // const matches = await prisma.products.findMany({
+        //     where: { OR: keywords.map(kw => ({ OR: [{ product_name: { contains: kw } }, { brand: { contains: kw } }] })) }
+        // });
+        return null;
     }
 
     async createGenericProduct(recallData) {
-        const product = await prisma.products.create({
-            data: { upc: '0', product_name: recallData.productDescription.substring(0, 100), brand: recallData.company, image_link: null }
+        // Product does not exist. Create a new one
+        let apiData = null;
+        for(const potentialUpc of recallData.extractedUPCs) {
+            const apiUrl = `https://world.openfoodfacts.net/api/v2/product/${potentialUpc}.json`;
+            const response = await fetch(apiUrl)
+            apiData = await response.json();
+
+            if (apiData.status === 1) {
+                break;
+            }
+        }
+        
+        // If the api cannot find any valid upcs at all, create a generic product
+        if (!apiData || apiData.status === 0) {
+            console.log("Recalled product code cannot be found, creating generic Product.");
+            const product = await prisma.products.create({
+                data: { upc: recallData.extractedUPCs[0] || '0', product_name: recallData.productDescription, brand: recallData.company, image_link: null }
+            });
+            return product.product_id;
+        }
+
+
+        // Status 1 means the product was found in the external database
+        // Extract product details, provide fallback strings if null
+        const upc = apiData.code;
+        const newProductName = apiData.product.product_name || "Unknown Product";
+        const newBrand = apiData.product.brands || "Unknown Brand";
+        const imageLink = apiData.product.image_front_url || apiData.product.image_url || null;
+        const allergens = (apiData.product.allergens_tags || [])
+            .map(a => a.replace('en:', ''))
+            .join(', ') || null;
+
+        // Manually calculate the next product_id (Auto-increment workaround)
+        // const lastProduct = await prisma.products.findFirst({
+        //     orderBy: { product_id: 'desc' }
+        // });
+        // const nextProductId = lastProduct ? lastProduct.product_id + 1 : 1;
+
+        // Save this new product to the local Products table
+        let existingProduct = await prisma.products.create({
+            data: {
+                upc: String(upc),
+                product_name: newProductName,
+                brand: newBrand,
+                image_link: imageLink,
+                allergens: allergens
+            }
         });
-        return product.product_id;
+        
+        console.log("New product successfully saved to local database!");
+        
+
+        
+        console.log("New item added to pantry successfully:", upc);
+
+
+
+        return existingProduct.product_id;
     }
 
     async checkForNewRecalls(days = 30) {
