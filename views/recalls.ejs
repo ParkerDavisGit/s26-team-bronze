@@ -45,7 +45,7 @@
             <% recall_data.forEach(recall => { %>
               <div class="card mb-3" style="width: 100vh;" data-recall-date="<%= recall.recall_date || recall.date || '' %>" data-in-pantry="<%= pantryProductIds.includes(recall.product_id) %>">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                  <% if (recall.report_date) { %><span class="small text-muted">FDA Report: <%= new Date(recall.report_date).toLocaleDateString() %></span><% } %>
+                  <% if (recall.recall_date) { %><span class="small text-muted">Recall Date: <%= new Date(recall.recall_date).toLocaleDateString() %></span><% } %>
                 </div>
 
                 <div class="card-body">
